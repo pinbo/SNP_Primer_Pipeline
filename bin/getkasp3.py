@@ -82,7 +82,8 @@ def kasp(seqfile):
 	# get the variaiton site among sequences
 	ids = [] # all other sequence names
 	for kk in fasta.keys():
-		if chrom in kk:
+		key_chr = kk.split("_")[2] # sequence chromosome name
+		if chrom in key_chr or key_chr in chrom: # 3B contig names do not have chromosome arm
 			target = kk
 		else:
 			ids.append(kk)
@@ -156,6 +157,7 @@ def kasp(seqfile):
 	
 	print "Sites that can differ all\n", variation
 	print "\nSites that can differ at least 1\n", variation2
+	#print "\nKeys of diffarray: ", diffarray.keys()
 	#############
 	# loop to write primer3 input for each variation site
 	# primer3 inputfile
@@ -312,10 +314,10 @@ def kasp(seqfile):
 			if varsite < snp_site:
 				pc = pl # pc is the common primer
 				# rr: range to check; only check 10 bases from 3' end
-				rr = range(pc.end - 10, pc.end) # pc.end is 1 based, so change to 0 based.
+				rr = range(max(pc.end - 10,gap_left), pc.end) # pc.end is 1 based, so change to 0 based.
 			else:
 				pc = pr
-				rr = range(pc.end -1, pc.end + 9)
+				rr = range(pc.end -1, min(pc.end + 9, gap_right)) # rr should be within the keys of diffarray, which is from gap_left to gap_right
 			# sum of all the variation in each site
 			aa = [sum(x) for x in zip(*(diffarray[k] for k in rr))]
 			if min(aa) > 0: # if common primer can differ all

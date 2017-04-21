@@ -23,7 +23,7 @@
 #
 
 # example
-# ./getflanking.py for_polymarker.csv blast_out.tsv temp_range.txt
+# ./getflanking.py for_polymarker.csv blast_out.tsv temp_range.txt 3
 
 ### Imported
 import sys
@@ -33,6 +33,12 @@ import sys
 polymarker_input = sys.argv[1]
 blast_file = sys.argv[2] # this is a special blast file with two columns in the last: qseq and sseq (query sequence and subject sequenc)
 outfile = sys.argv[3]
+genome_number =  int(sys.argv[4])
+if genome_number not in [1, 2, 3]:
+	sys.exit("Genome number need to be either 1, 2, or 3")
+
+genomes = "ABD"
+genomes = genomes[:genome_number] # final genomes
 
 # get snp position
 snp_pos = {}
@@ -64,7 +70,9 @@ for line in open(blast_file):
 	fields = line.split("\t")
 	query, subject = fields[:2]
 	snp, qchrom = query.split("_")[0:2] # snp name, query chromosome name
-	schrom = subject.split("_")[2][0:2] # subject chromosome name without arm
+	schrom = subject.split("_")[2] # subject chromosome name with arm
+	if schrom[1] not in genomes:
+		continue
 	pct_identity = float(fields[2])
 	align_length = int(fields[3])
 	# only get min-identity 90% and at least 50 bp alignment

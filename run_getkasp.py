@@ -27,10 +27,11 @@
 
 # change the reference location accordingly.
 
-# example: run_getkasp.py for_polymarker.csv
+# example: run_getkasp.py for_polymarker.csv 3
 
 def main(args):
 	polymarker_input = args[1]
+	genome_number =  args[2]
 	script_path = os.path.dirname(os.path.realpath(__file__)) + "/bin/" # scripts folder
 	reference = "/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_CSS_ABD-TGAC_v1.fa" # blast contig file
 	
@@ -45,7 +46,7 @@ def main(args):
 	call(cmd2, shell=True)
 	
 	# Step 3: parse the blast output file and output the homelog contigs and flanking ranges
-	cmd3 = script_path + "getflanking.py " + polymarker_input + " blast_out.txt temp_range.txt"
+	cmd3 = script_path + "getflanking.py " + polymarker_input + " blast_out.txt temp_range.txt " + genome_number
 	print "Step 3: Get the flanking range command:\n", cmd3
 	call(cmd3, shell=True)
 	

@@ -90,7 +90,7 @@ def kasp(seqfile):
 	# get the variaiton site among sequences
 	ids = [] # all other sequence names
 	for kk in fasta.keys():
-		if chrom in kk:
+		if chrom in kk or kk in chrom: # 3B contig names do not have chromosome arm
 			target = kk
 		else:
 			ids.append(kk)
