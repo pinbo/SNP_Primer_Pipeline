@@ -65,7 +65,17 @@ def main(args):
 	print "Step 6: Get KASP primers for each marker command:\n", cmd6
 	call(cmd6, shell=True)
 	
-	print "\n\n\n KASP primers have been designed successfully!\n Check files beginning with 'select_primer'"
+	# step 7: parse the for_polymarker input and create the input for SNP2CAPS
+	cmd7 = script_path + "parse_polymarker_input_for_CAPS.py " + polymarker_input
+	print "Step 7: Create input file for SNP2CAPS:\n", cmd7
+	call(cmd7, shell=True)
+	
+	# step 8: run SNP2CAPS script to find all potential Restriciton enzymes
+	cmd8 = script_path + "SNP2CAPS.pl for_SNP2CAPS.fa REgcg.txt EcoRV,BamHI > CAPS_output.txt"
+	print "Step 8: run SNP2CAPS script to find all potential Restriciton enzymes:\n", cmd8
+	call(cmd8, shell=True)
+	
+	print "\n\n\n KASP primers have been designed successfully!\n Check files beginning with 'select_primer' and CAPS_output.txt"
 	return 0
 
 if __name__ == '__main__':
