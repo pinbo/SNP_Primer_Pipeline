@@ -19,6 +19,7 @@ getKASP_pipeline needs following 3 software to find differences among homeologs 
 1. Muscle: Multiple sequence alignment program (http://www.drive5.com/muscle/)
 2. Primer3: program for designing PCR primers (http://primer3.sourceforge.net/)
 3. blast+ package from NCBI (https://blast.ncbi.nlm.nih.gov/Blast.cgi)
+4. SNP2CAPS.pl: a modified version to check all the restriction enzymes for the snp site (http://pgrc.ipk-gatersleben.de/snp2caps/)
 
 Please make sure "muscle", "primer3_core" and "blastn" are in the software PATH. Otherwise, please modify specific scripts and give the software path.
 
@@ -28,25 +29,33 @@ Please make sure "muscle", "primer3_core" and "blastn" are in the software PATH.
 
 # Usage
 
-I divided the pipeline into 6 steps:
+I divided the pipeline into 8 steps:
 - Script "parse_polymarker_input.py": parse the polymarker input and prepare a fasta file for blast
 - Blast using system command "blastn"
 - Script "getflanking.py": Parse the blast output file and output the homelog contigs and flanking ranges
 - Split the range file for each marker with system command "awk"
 - Get flanking sequences for each file with command "blastdbcmd"
 - Get KASP primers using script "getkasp3.py"
+- Prepare SNP2CAPS.pl input file using script "parse_polymarker_input_for_CAPS.py"
+- Run SNP2CAPS script to find all potential Restriciton enzymes
+
+The last 2 steps were not for designing KASPars but for CAPS marker design.
 
 You can run this step by step or run the whole pipeline with script "run_getkasp.py". I suggest run the 6 steps in the script "run_getkasp.py" stey by step to get familiar how it works first.
 
-Example: `run_getkasp.py for_polymarker.csv`
+Example: `run_getkasp.py for_polymarker.csv 3`
 
 Change the software paths, blast contig names and locations etc accordingly.
 
 The "bin" folder has all the scripts for each step and softare primer3 and muscle in case your system does not have them.
+
+# Main Changes
+- 5/14/2017 Added steps to check restriciton enzymes for CAPS marker design.
+- Added ploidy parameter for wheat species in different ploidy.
 
 # Acknowledgements
 I borrowed ideas from the polymarker scripts (https://github.com/TGAC/bioruby-polyploid-tools), a great tool for Genome Specific KASPar design in polyploid species. Thanks to the author of Polymarker.
 
 I also borrowed some codes from biopython (https://github.com/biopython/biopython/blob/master/Bio/Emboss/Primer3.py). Thanks to them too.
 
-Thanks to the open source software **Primer3** (http://primer3.sourceforge.net/), **Muscle** (http://www.drive5.com/muscle/), and blast+ package from NCBI (https://blast.ncbi.nlm.nih.gov/Blast.cgi).
+Thanks to the open source software **Primer3** (http://primer3.sourceforge.net/), **Muscle** (http://www.drive5.com/muscle/),  blast+ package from NCBI (https://blast.ncbi.nlm.nih.gov/Blast.cgi), and **SNP2CAPS** (http://pgrc.ipk-gatersleben.de/snp2caps/).
