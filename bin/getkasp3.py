@@ -93,15 +93,15 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		indexR += align_left
 		seqL = s2[:indexL].replace("-","")
 		seqR = s2[indexR:].replace("-","")
-		print "indexL, indexR, nL, nR ", indexL, indexR, nL, nR
-		print "s2[indexL:indexR] ", s2[indexL:indexR]
+		#print "indexL, indexR, nL, nR ", indexL, indexR, nL, nR
+		#print "s2[indexL:indexR] ", s2[indexL:indexR]
 		if len(seqL) < nL: # in case it does not have enough bases
 			seqL = "-" * (nL - len(seqL)) + seqL
 		if len(seqR) < nR:
 			seqL = seqR + "-" * (nR - len(seqR))
 		seqk = seqL[::-1][:nL][::-1] + s2[indexL:indexR] + seqR[:nR]
 		seq2comp.append(seqk)
-		print k, "\t", seqk
+		#print k, "\t", seqk
 	return seq2comp
 
 def kasp(seqfile):
@@ -157,12 +157,14 @@ def kasp(seqfile):
 	
 	# get the target ID template base coordinate in the alignment
 	t2a = {} # template to alignment
+	a2t = {}
 	ngap = 0 # gaps
 	for i in range(alignlen):
 		if fasta[target][i] == "-":
 			ngap += 1
 			continue
 		t2a[i - ngap] = i
+		a2t[i] = i - ngap
 
 	print "last key of t2a", i - ngap
 	
@@ -180,7 +182,9 @@ def kasp(seqfile):
 	ngap = 0 # gap number
 	diffarray = {} # a list of 0 or 1: the same as or different from the site in each sequences of ids
 	#for i in range(alignlen):
-	for i in range(gap_left + 20, gap_right - 20): # exclude 20 bases on each side
+	start_left = t2a[a2t[gap_left] + 20]
+	end_right = t2a[a2t[gap_right] - 20]
+	for i in range(start_left, end_right - 20): # exclude 20 bases on each side
 		b1 = fasta[target][i]
 		if b1 == "-":  # target non-gap base
 			ngap += 1
