@@ -167,6 +167,7 @@ def kasp(seqfile):
 		a2t[i] = i - ngap
 
 	print "last key of t2a", i - ngap
+	print "last key of a2t", i
 	
 	seq_template = fasta[target].replace("-","") # remove all gaps
 
@@ -182,24 +183,25 @@ def kasp(seqfile):
 	ngap = 0 # gap number
 	diffarray = {} # a list of 0 or 1: the same as or different from the site in each sequences of ids
 	#for i in range(alignlen):
-	start_left = t2a[a2t[gap_left] + 20]
-	end_right = t2a[a2t[gap_right] - 20]
-	for i in range(start_left, end_right - 20): # exclude 20 bases on each side
+	for i in range(gap_left, gap_right): # exclude 20 bases on each side
 		b1 = fasta[target][i]
 		if b1 == "-":  # target non-gap base
 			ngap += 1
 			continue
 		j = i - gap_left_target # index number in target sequence without leading gaps
+		if j - ngap < 20 or j - ngap > len(seq_template) - 20:
+			continue
 		nd = 0 # number of difference
 		da = [0] * len(ids) # differ array
 		m = 0 # counter of next loop
 		pos_template = j - ngap # position in the target template (no gaps)
+		#print "i, j, ngap ", i, j, ngap
 		if j - ngap < snp_site:
-			align_left = t2a[i - ngap - 19] # 20 bp left of current position
+			align_left = t2a[j - ngap - 19] # 20 bp left of current position
 			align_right = i
 		else:
 			align_left = i # 20 bp left of current position
-			align_right = t2a[i - ngap + 19]
+			align_right = t2a[j - ngap + 19]
 		seq2comp = get_homeo_seq(fasta, target, ids, align_left, align_right) # list of sequences for comparison
 		for k in seq2comp:
 			if j - ngap < snp_site:
