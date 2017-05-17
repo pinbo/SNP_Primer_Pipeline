@@ -41,6 +41,68 @@ raw = glob("flanking_temp_marker*") # All file names start from "flanking"
 raw.sort()
 
 iupac = {"R": "AG", "Y": "TC", "S": "GC", "W": "AT", "K": "TG", "M": "AC"}
+# simple Tm calculator
+def Tm(seq):
+	t=0
+	for a in seq:
+		if a=='A' or a=='T':
+			t=t+2
+		if a=='C' or a=='G':
+			t=t+4
+	return t
+
+# calculate GC content of a sequence
+def Calc_GC(seq):
+	t = 0.0 # float
+	for a in seq:
+		if a=='C' or a=='G':
+			t += 1
+	return t / len(seq) * 100
+
+# function to find the segments with largest Tm
+def FindLongestSubstring(s1, s2):
+	longestStart = 0
+	longestEnd = 0
+	largestTm = 0
+	start = 0
+	gaps = [i for i, c in enumerate(s1) if c=='-' or s2[i]=='-']
+	gaps.append(len(s1))
+	for gap in gaps:
+		end = gap
+		tm = Tm(s1[start:end])
+		if  tm > largestTm:
+			longestStart = start
+			longestEnd = end
+			largestTm = tm
+		start = gap + 1
+	nL = len(s1[:longestStart].replace("-","")) # number of bases on the left of the longest segments
+	nR = len(s1[longestEnd:].replace("-",""))  # number of bases on the right of the longest segments
+	return [longestStart, longestEnd, nL, nR]
+
+# get the list of sequences in the homeolog groups for comparison with current primer
+def get_homeo_seq(fasta, target, ids, align_left, align_right):
+	s1 = fasta[target] # primer sequence in the template with gaps
+	seq2comp = [] # final sequence to compare for each other homeolog
+	for k in ids:
+		s2 = fasta[k]
+		targetSeq = s1[align_left:(align_right + 1)]
+		homeoSeq = s2[align_left:(align_right + 1)]
+		# Get the sequences for comparison
+		indexL, indexR, nL, nR = FindLongestSubstring(targetSeq, homeoSeq)
+		indexL += align_left
+		indexR += align_left
+		seqL = s2[:indexL].replace("-","")
+		seqR = s2[indexR:].replace("-","")
+		print "indexL, indexR, nL, nR ", indexL, indexR, nL, nR
+		print "s2[indexL:indexR] ", s2[indexL:indexR]
+		if len(seqL) < nL: # in case it does not have enough bases
+			seqL = "-" * (nL - len(seqL)) + seqL
+		if len(seqR) < nR:
+			seqL = seqR + "-" * (nR - len(seqR))
+		seqk = seqL[::-1][:nL][::-1] + s2[indexL:indexR] + seqR[:nR]
+		seq2comp.append(seqk)
+		print k, "\t", seqk
+	return seq2comp
 
 def kasp(seqfile):
 	#flanking_temp_marker_IWB1855_7A_R_251.fa
@@ -78,7 +140,6 @@ def kasp(seqfile):
 				fasta.setdefault(sequence_name, "")
 				fasta[sequence_name] += line.rstrip()
 
-
 	# get the variaiton site among sequences
 	ids = [] # all other sequence names
 	for kk in fasta.keys():
@@ -94,6 +155,17 @@ def kasp(seqfile):
 	alignlen = len(fasta[target])
 	print "Alignment length: ", alignlen
 	
+	# get the target ID template base coordinate in the alignment
+	t2a = {} # template to alignment
+	ngap = 0 # gaps
+	for i in range(alignlen):
+		if fasta[target][i] == "-":
+			ngap += 1
+			continue
+		t2a[i - ngap] = i
+
+	print "last key of t2a", i - ngap
+	
 	seq_template = fasta[target].replace("-","") # remove all gaps
 
 	variation = [] # variation sites that can differ ALL
@@ -108,43 +180,35 @@ def kasp(seqfile):
 	ngap = 0 # gap number
 	diffarray = {} # a list of 0 or 1: the same as or different from the site in each sequences of ids
 	#for i in range(alignlen):
-	for i in range(gap_left, gap_right):
+	for i in range(gap_left + 20, gap_right - 20): # exclude 20 bases on each side
+		b1 = fasta[target][i]
+		if b1 == "-":  # target non-gap base
+			ngap += 1
+			continue
 		j = i - gap_left_target # index number in target sequence without leading gaps
 		nd = 0 # number of difference
 		da = [0] * len(ids) # differ array
 		m = 0 # counter of next loop
-		nl1 = len(fasta[target][gap_left:i]) - len(fasta[target][gap_left:i].rstrip("-")) # number of gaps on the left of current site for the target
-		nr1 = len(fasta[target][i:gap_right]) - len(fasta[target][i:gap_right].lstrip("-")) + 1
+		pos_template = j - ngap # position in the target template (no gaps)
 		if j - ngap < snp_site:
-			pos_template = j - ngap + nl1 # position in the target template (no gaps)
+			align_left = t2a[i - ngap - 19] # 20 bp left of current position
+			align_right = i
 		else:
-			pos_template = j - ngap - nr1
-		if (pos_template < snp_site and nl1 > 10) or (pos_template >= snp_site and nr1 > 10):
-			if fasta[target][i] == "-":
-				ngap += 1
-			continue # go to next loop
-		for k in ids:
-			# below nl1 to nr2 is for handling gaps
-			#nl1 = i - len(fasta[target][:i].rstrip("-")) # number of gaps on the left of current site for the target
-			nl2 = len(fasta[k][gap_left:i]) - len(fasta[k][gap_left:i].rstrip("-")) # number of gaps on the left of current site for the homeolog
-			#nr1 = len(fasta[target][i:]) - len(fasta[target][i:].lstrip("-")) + 1
-			nr2 = len(fasta[k][i:gap_right]) - len(fasta[k][i:gap_right].lstrip("-")) + 1
-			if j - ngap < snp_site: # variation site should be left end
-				b1 = fasta[target][i:gap_right].replace("-","")[nl1] # target non-gap base
-				b2 = fasta[k][i:gap_right].replace("-","")[nl2] # homeolog non-gap bas
+			align_left = i # 20 bp left of current position
+			align_right = t2a[i - ngap + 19]
+		seq2comp = get_homeo_seq(fasta, target, ids, align_left, align_right) # list of sequences for comparison
+		for k in seq2comp:
+			if j - ngap < snp_site:
+				b2 = k[-1] # homeolog non-gap bas
 			else:
-				b1 = fasta[target][gap_left:i].replace("-","")[-nr1] # target non-gap base
-				b2 = fasta[k][gap_left:i].replace("-","")[-nr2] # homeolog non-gap bas
+				b2 = k[0]
 			if b1 != b2:
-				nd+=1
+				nd += 1
 				da[m] = 1 # m sequence has variation from target
 			m += 1
-		
-		#diffarray[j - ngap] = da # variation infor for each site
-		if pos_template not in diffarray:
-			diffarray[pos_template] = da
-		else:
-			diffarray[pos_template] = [sum(x) for x in zip(da,diffarray[pos_template])]
+
+		# for each site pos_template
+		diffarray[pos_template] = da
 		if nd == len(ids): # different from all other sequences
 			if pos_template not in variation: # in case multiple gaps
 				variation.append(pos_template)
