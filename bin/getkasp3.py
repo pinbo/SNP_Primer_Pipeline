@@ -87,8 +87,8 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		s2 = fasta[k]
 		targetSeq = s1[align_left:(align_right + 1)]
 		homeoSeq = s2[align_left:(align_right + 1)]
-		print "Targetseq ", targetSeq
-		print "homeoSeq  ", homeoSeq
+		#print "Targetseq ", targetSeq
+		#print "homeoSeq  ", homeoSeq
 		# Get the sequences for comparison
 		indexL, indexR, nL, nR = FindLongestSubstring(targetSeq, homeoSeq)
 		indexL += align_left
