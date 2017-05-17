@@ -87,6 +87,8 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		s2 = fasta[k]
 		targetSeq = s1[align_left:(align_right + 1)]
 		homeoSeq = s2[align_left:(align_right + 1)]
+		print "Targetseq ", targetSeq
+		print "homeoSeq  ", homeoSeq
 		# Get the sequences for comparison
 		indexL, indexR, nL, nR = FindLongestSubstring(targetSeq, homeoSeq)
 		indexL += align_left
@@ -188,23 +190,21 @@ def kasp(seqfile):
 		if b1 == "-":  # target non-gap base
 			ngap += 1
 			continue
-		j = i - gap_left_target # index number in target sequence without leading gaps
-		if j - ngap < 20 or j - ngap > len(seq_template) - 20:
+		pos_template = a2t[i] # position in the target template (no gaps)
+		if pos_template < 20 or pos_template > len(seq_template) - 20:
 			continue
 		nd = 0 # number of difference
 		da = [0] * len(ids) # differ array
 		m = 0 # counter of next loop
-		pos_template = j - ngap # position in the target template (no gaps)
-		#print "i, j, ngap ", i, j, ngap
-		if j - ngap < snp_site:
-			align_left = t2a[j - ngap - 19] # 20 bp left of current position
+		if pos_template < snp_site:
+			align_left = t2a[pos_template - 19] # 20 bp left of current position
 			align_right = i
 		else:
 			align_left = i # 20 bp left of current position
-			align_right = t2a[j - ngap + 19]
+			align_right = t2a[pos_template + 19]
 		seq2comp = get_homeo_seq(fasta, target, ids, align_left, align_right) # list of sequences for comparison
 		for k in seq2comp:
-			if j - ngap < snp_site:
+			if pos_template < snp_site:
 				b2 = k[-1] # homeolog non-gap bas
 			else:
 				b2 = k[0]
@@ -387,7 +387,7 @@ def kasp(seqfile):
 				rr = range(max(pc.end - 10,gap_left), pc.end) # pc.end is 1 based, so change to 0 based.
 			else:
 				pc = pr
-				rr = range(pc.end -1, min(pc.end + 9, gap_right)) # rr should be within the keys of diffarray, which is from gap_left to gap_right
+				rr = range(pc.end -1, min(pc.end + 9, len(seq_template) - 20)) # rr should be within the keys of diffarray, which is from gap_left to gap_right
 			# sum of all the variation in each site
 			aa = [sum(x) for x in zip(*(diffarray[k] for k in rr))]
 			if min(aa) > 0: # if common primer can differ all
