@@ -41,6 +41,20 @@ raw = glob("flanking_temp_marker*") # All file names start from "flanking"
 raw.sort()
 
 iupac = {"R": "AG", "Y": "TC", "S": "GC", "W": "AT", "K": "TG", "M": "AC"}
+
+#from sys import platform
+def get_software_path(base_path):
+	if sys.platform.startswith('linux'): # linux
+		primer3_path = base_path + "/primer3_core"
+		muscle_path = base_path + "/muscle"
+	elif sys.platform == "win32" or sys.platform == "cygwin": # Windows...
+		primer3_path = base_path + "/primer3_core.exe"
+		muscle_path = base_path + "/muscle.exe"
+	elif sys.platform == "darwin": # MacOSX
+		primer3_path = base_path + "/primer3_core_darwin64"
+		muscle_path = base_path + "/muscle3.8.31_i86darwin64"
+	return primer3_path, muscle_path
+
 # simple Tm calculator
 def Tm(seq):
 	t=0
@@ -117,8 +131,9 @@ def kasp(seqfile):
 	alt_allele = iupac[allele][0] # choose A or T
 	
 	# software path
-	muscle_path = "muscle"
-	primer3_path = "primer3_core"
+	primer3_path, muscle_path = get_software_path(getkasp_path)
+	#muscle_path = "muscle"
+	#primer3_path = "primer3_core"
 
 	########################
 	# STEP 0: create alignment file and primer3output file
@@ -182,7 +197,6 @@ def kasp(seqfile):
 	gap_right = min([len(v.rstrip('-')) for k, v in fasta.items()])
 	print "gap_left_target, gap_left and gap_right: ", gap_left_target, gap_left, gap_right
 	
-	ngap = 0 # gap number
 	diffarray = {} # a list of 0 or 1: the same as or different from the site in each sequences of ids
 	#for i in range(alignlen):
 	for i in range(gap_left, gap_right): # exclude 20 bases on each side
@@ -221,9 +235,6 @@ def kasp(seqfile):
 		if nd > 0: # different from at least 1 other sequence
 			if pos_template not in variation2: # in case multiple gaps
 				variation2.append(pos_template)
-		# if site i is a gap, gap # + 1
-		if fasta[target][i] == "-":
-			ngap += 1
 	
 	print "Sites that can differ all\n", variation
 	print "\nSites that can differ at least 1\n", variation2
@@ -370,7 +381,6 @@ def kasp(seqfile):
 	# write to file
 	outfile = open(out, 'w')
 	outfile.write("index\tproduct_size\ttype\tstart\tend\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\t3'differall\tpenalty\tcompl_any\tcompl_end\n")
-
 	#for pp in primerpairs:
 	for i, pp in primerpairs.items():
 		varsite = int(i.split("-")[-1]) # variation site
@@ -394,6 +404,8 @@ def kasp(seqfile):
 				outfile.write("\t".join([i, str(pp.product_size), "LEFT", pl.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end]) + "\n")
 				outfile.write("\t".join([i, str(pp.product_size), "RIGHT", pr.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end]) + "\n")
 
+	outfile.write("\n\nSites that can differ all in target " + target + "\n")
+	outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
 	outfile.close()
 
 # loop for all snp sequence files
