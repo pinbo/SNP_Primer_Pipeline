@@ -52,8 +52,9 @@ def find(s, ch):
     return [i + 1 for i, ltr in enumerate(s) if ltr == ch]
 
 # function to 
-# take 250 bp up/down-stream.
-xstream = 250
+# take 500 bp up/down-stream.
+# increased this value from 250 to 500 for dCAPS marker design later.
+xstream = 500
 
 flanking = {} # flanking information
 snpinfo = {}
