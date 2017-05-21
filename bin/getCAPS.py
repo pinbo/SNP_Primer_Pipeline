@@ -262,7 +262,7 @@ def mismatchn (s1, s2):
 def primer_blast(primer_for_blast, outfile_blast):
 	forblast = open("for_blast.fa", 'w') # for blast against the gnome
 	for k, v in primer_for_blast.items(): # k is the sequence and v is the number
-		forblast.write(">primer" + v + "\n" + k + "\n")
+		forblast.write(">" + v + "\n" + k + "\n")
 	forblast.close()
 	blast_hit = {} # matched chromosomes for primers: less than 2 mismatches in the first 4 bps from 3'
 	### for blast
@@ -621,6 +621,7 @@ def caps(seqfile):
 		blast_hit = primer_blast(primer_for_blast, outfile_blast) # chromosome hit for each primer
 	# write output file
 	for i, pp in final_primers.items():
+		varsite = int(i.split("-")[-1]) # variation site
 		pl = pp.left
 		pr = pp.right
 		# check whether 3' can differ all: not necessary for here, because I only used sites that can differ all.
