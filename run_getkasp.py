@@ -61,7 +61,7 @@ def main(args):
 	call(cmd5, shell=True)
 	
 	# step 6: get kasp
-	cmd6 = script_path + "getkasp3.py"
+	cmd6 = script_path + "getkasp3.py 1" # add blast option
 	print "Step 6: Get KASP primers for each marker command:\n", cmd6
 	call(cmd6, shell=True)
 	
@@ -74,6 +74,11 @@ def main(args):
 	cmd8 = script_path + "SNP2CAPS.pl for_SNP2CAPS.fa " + script_path + "REgcg.txt EcoRV,BamHI > CAPS_output.txt"
 	print "Step 8: run SNP2CAPS script to find all potential Restriciton enzymes:\n", cmd8
 	call(cmd8, shell=True)
+	
+	# step 9: get CAPS markers
+	cmd9 = script_path + "getCAPS.py 1" # add blast option
+	print "Step 9: Get CAPS and dCAPS primers for each marker command:\n", cmd9
+	call(cmd9, shell=True)
 	
 	print "\n\n\n KASP primers have been designed successfully!\n Check files beginning with 'select_primer' and CAPS_output.txt"
 	return 0

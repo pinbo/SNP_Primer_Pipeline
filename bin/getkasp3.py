@@ -31,11 +31,10 @@
 ### Imported
 from subprocess import call
 import getopt, sys, os, re
-
+from glob import glob
 #########################
 
-from glob import glob
-
+blast = sys.argv[1] # 0 or 1, whether to blast
 # get all the raw sequences
 raw = glob("flanking_temp_marker*") # All file names start from "flanking"
 raw.sort()
@@ -54,6 +53,42 @@ def get_software_path(base_path):
 		primer3_path = base_path + "/primer3_core_darwin64"
 		muscle_path = base_path + "/muscle3.8.31_i86darwin64"
 	return primer3_path, muscle_path
+
+# function to get reverse complement
+def ReverseComplement(seq):
+	# too lazy to construct the dictionary manually, use a dict comprehension
+	seq1 = 'ATCGTAGCatcgtagc'
+	seq_dict = { seq1[i]:seq1[i+4] for i in range(16) if i < 4 or 8<=i<12 }
+	return "".join([seq_dict[base] for base in reversed(seq)])
+
+# classes
+class Primers(object):
+	"""A primer set designed by Primer3"""
+	def __init__(self):
+		self.start = 0
+		self.end = 0
+		self.length = 0
+		self.tm = 0.0
+		self.gc = 0.0
+		self.anys = 0.0
+		self.three = 0.0
+		self.hairpin = 0.0
+		self.end_stability = 0.0
+		self.seq = ""
+		self.difthreeall = "NO" # whether 3' site can differ all
+	def formatprimer(self):
+		formatout = "\t".join(str(x) for x in [self.start, self.end, self.length, self.tm, self.gc, self.anys, self.three, self.end_stability, self.hairpin, self.seq, ReverseComplement(self.seq), self.difthreeall])
+		return(formatout)
+
+class PrimerPair(object):
+	"""A pair of primers designed by Primer3"""
+	def __init__(self):
+		self.left = Primers()
+		self.right = Primers()
+		self.compl_any = "NA"
+		self.compl_end = "NA"
+		self.penalty = "NA"
+		self.product_size = 0
 
 # simple Tm calculator
 def Tm(seq):
@@ -120,11 +155,46 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		#print k, "\t", seqk
 	return seq2comp
 
+# function to blast and parse the output of each primer in the wheat genome
+def primer_blast(primer_for_blast, outfile_blast):
+	forblast = open("for_blast.fa", 'w') # for blast against the gnome
+	for k, v in primer_for_blast.items():
+		forblast.write(">" + k + "\n" + v + "\n")
+	forblast.close()
+	blast_hit = {} # matched chromosomes for primers: less than 2 mismatches in the first 4 bps from 3'
+	### for blast
+	reference = "/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta"
+	cmd2 = 'blastn -task blastn -db ' + reference + ' -query for_blast.fa -outfmt "6 std qseq sseq qlen slen" -num_threads 3 -word_size 7 -out ' + outfile_blast
+	print "Step 2: Blast command:\n", cmd2
+	call(cmd2, shell=True)
+	# process blast file
+	# blast fields
+	# IWB50236_7A_R	IWGSC_CSS_7DS_scaff_3919748	98.718	78	1	0	24	101	4891	4968	1.55e-30	138	CTCATCAAATGATTCAAAAATATCGATRCTTGGCTGGTGTATCGTGCAGACGACAGTTCGTCCGGTATCAACAGCATT	CTCATCAAATGATTCAAAAATATCGATGCTTGGCTGGTGTATCGTGCAGACGACAGTTCGTCCGGTATCAACAGCATT	101 5924
+	# Fields: 
+	# 1: query id, subject id, % identity, alignment length, mismatches, gap opens, 
+	# 7: q. start, q. end, s. start, s. end, evalue, bit score
+	# 13: q. sequence, s. sequence, q. length s. length
+	for line in open(outfile_blast):
+		if line.startswith('#'):
+			continue
+		fields = line.split("\t")
+		query, subject, pct_identity, align_length= fields[:4]
+		qstart, qstop, sstart, sstop = [int(x) for x in fields[6:10]]
+		qseq, sseq = fields[12:14]
+		qlen = int(fields[14])
+		n1 = qlen - qstop
+		if n1 < 2 and mismatchn(qseq[(n1 - 4):], sseq[(n1 - 4):]) + n1 < 2: # if less than 2 mismtaches in the first 4 bases from the 3' end of the primer
+			blast_hit[query] = blast_hit.setdefault(query, "") + ";" + subject + ":" + str(sstart)
+	return blast_hit
+
 def kasp(seqfile):
 	#flanking_temp_marker_IWB1855_7A_R_251.fa
 	snpname, chrom, allele, pos =re.split("_|\.", seqfile)[3:7]
 	getkasp_path = os.path.dirname(os.path.realpath(__file__))
-	out = "selected_primers_" + snpname + ".txt"
+	directory = "KASP_output"
+	if not os.path.exists(directory):
+		os.makedirs(directory)
+	out = directory + "/selected_KASP_primers_" + snpname + ".txt"
 	target = "2AS" # target sequence name
 	product_min = 50
 	product_max = 250
@@ -242,7 +312,7 @@ def kasp(seqfile):
 	#############
 	# loop to write primer3 input for each variation site
 	# primer3 inputfile
-	primer3input = "primer3.input." + snpname
+	primer3input = directory + "/primer3.input." + snpname
 	p3input = open(primer3input, 'w')
 
 	#seq_template = fasta[target].replace("-","") # remove all gaps
@@ -279,50 +349,12 @@ def kasp(seqfile):
 	p3input.close()
 
 	# primer3 output file
-	primer3output = "primer3.output." + snpname
+	primer3output = directory + "/primer3.output." + snpname
 	p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " " + primer3input
 	print "Primer3 command 1st time: ", p3cmd
 	call(p3cmd, shell=True)
 
 	##########################
-	# function to get reverse complement
-	def ReverseComplement(seq):
-		# too lazy to construct the dictionary manually, use a dict comprehension
-		seq1 = 'ATCGTAGCatcgtagc'
-		seq_dict = { seq1[i]:seq1[i+4] for i in range(16) if i < 4 or 8<=i<12 }
-		return "".join([seq_dict[base] for base in reversed(seq)])
-
-	# classes
-	class Primers(object):
-		"""A primer set designed by Primer3"""
-		def __init__(self):
-			self.start = 0
-			self.end = 0
-			self.length = 0
-			self.tm = 0.0
-			self.gc = 0.0
-			self.anys = 0.0
-			self.three = 0.0
-			self.hairpin = 0.0
-			self.end_stability = 0.0
-			self.seq = ""
-			self.difthreeall = "NO" # whether 3' site can differ all
-		def formatprimer(self):
-			formatout = "\t".join(str(x) for x in [self.start, self.end, self.length, self.tm, self.gc, self.anys, self.three, self.end_stability, self.hairpin, self.seq, ReverseComplement(self.seq), self.difthreeall])
-			return(formatout)
-
-	class PrimerPair(object):
-		"""A pair of primers designed by Primer3"""
-		def __init__(self):
-			self.left = Primers()
-			self.right = Primers()
-			self.compl_any = "NA"
-			self.compl_end = "NA"
-			self.penalty = "NA"
-			self.product_size = 0
-
-
-
 	### parse primer 3 primer check output
 	primerpairs = {} # sequence ID is the key
 
@@ -382,6 +414,9 @@ def kasp(seqfile):
 	outfile = open(out, 'w')
 	outfile.write("index\tproduct_size\ttype\tstart\tend\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\t3'differall\tpenalty\tcompl_any\tcompl_end\n")
 	#for pp in primerpairs:
+	# Get primer list for blast
+	primer_for_blast = {}
+	final_primers = {} # final primers for output
 	for i, pp in primerpairs.items():
 		varsite = int(i.split("-")[-1]) # variation site
 		if pp.product_size != 0:
@@ -401,9 +436,24 @@ def kasp(seqfile):
 			# sum of all the variation in each site
 			aa = [sum(x) for x in zip(*(diffarray[k] for k in rr))]
 			if min(aa) > 0: # if common primer can differ all
-				outfile.write("\t".join([i, str(pp.product_size), "LEFT", pl.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end]) + "\n")
-				outfile.write("\t".join([i, str(pp.product_size), "RIGHT", pr.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end]) + "\n")
-
+				primer_for_blast[pl.seq] = 1 # use seq as keys
+				primer_for_blast[pr.seq] = 1 # because a lot of same sequences
+				pp.left = pl
+				pp.right = pr
+				final_primers[i] = pp
+					
+	# blast primers
+	blast_hit = {}
+	outfile_blast = directory + "/primer_blast_out_" + target + ".txt"
+	if blast:
+		blast_hit = primer_blast(primer_for_blast, outfile_blast) # chromosome hit for each primer
+	# write output file
+	for i, pp in final_primers.items():
+		pl = pp.left
+		pr = pp.right
+		outfile.write("\t".join([i, str(pp.product_size), "LEFT", pl.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, blast_hit.setdefault(pl.seq, "")]) + "\n")
+		outfile.write("\t".join([i, str(pp.product_size), "RIGHT", pr.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, blast_hit.setdefault(pl.seq, "")]) + "\n")
+	
 	outfile.write("\n\nSites that can differ all in target " + target + "\n")
 	outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
 	outfile.close()
