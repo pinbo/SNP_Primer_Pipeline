@@ -158,8 +158,8 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 # function to blast and parse the output of each primer in the wheat genome
 def primer_blast(primer_for_blast, outfile_blast):
 	forblast = open("for_blast.fa", 'w') # for blast against the gnome
-	for k, v in primer_for_blast.items():
-		forblast.write(">" + k + "\n" + v + "\n")
+	for k, v in primer_for_blast.items(): # k is primer sequence and v is the number
+		forblast.write(">" + k + "\n" + k + "\n")
 	forblast.close()
 	blast_hit = {} # matched chromosomes for primers: less than 2 mismatches in the first 4 bps from 3'
 	### for blast
