@@ -65,6 +65,7 @@ def ReverseComplement(seq):
 class Primers(object):
 	"""A primer set designed by Primer3"""
 	def __init__(self):
+		self.name = ""
 		self.start = 0
 		self.end = 0
 		self.length = 0
@@ -155,11 +156,16 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		#print k, "\t", seqk
 	return seq2comp
 
+# function to count mismtaches
+def mismatchn (s1, s2):
+	return sum(c1!=c2 for c1,c2 in zip(s1,s2))
+
 # function to blast and parse the output of each primer in the wheat genome
+# depends on function: mismtachn
 def primer_blast(primer_for_blast, outfile_blast):
 	forblast = open("for_blast.fa", 'w') # for blast against the gnome
 	for k, v in primer_for_blast.items(): # k is primer sequence and v is the number
-		forblast.write(">" + k + "\n" + k + "\n")
+		forblast.write(">" + v + "\n" + k + "\n")
 	forblast.close()
 	blast_hit = {} # matched chromosomes for primers: less than 2 mismatches in the first 4 bps from 3'
 	### for blast
@@ -412,11 +418,13 @@ def kasp(seqfile):
 
 	# write to file
 	outfile = open(out, 'w')
-	outfile.write("index\tproduct_size\ttype\tstart\tend\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\t3'differall\tpenalty\tcompl_any\tcompl_end\n")
+	outfile.write("index\tproduct_size\ttype\tstart\tend\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\t3'differall\tpenalty\tcompl_any\tcompl_end\tPrimerID\tmatched_chromosomes\n")
 	#for pp in primerpairs:
 	# Get primer list for blast
 	primer_for_blast = {}
 	final_primers = {} # final primers for output
+	nL = 0 # left primer count
+	nR = 0 # right primer count
 	for i, pp in primerpairs.items():
 		varsite = int(i.split("-")[-1]) # variation site
 		if pp.product_size != 0:
@@ -436,8 +444,18 @@ def kasp(seqfile):
 			# sum of all the variation in each site
 			aa = [sum(x) for x in zip(*(diffarray[k] for k in rr))]
 			if min(aa) > 0: # if common primer can differ all
-				primer_for_blast[pl.seq] = 1 # use seq as keys
-				primer_for_blast[pr.seq] = 1 # because a lot of same sequences
+				if pl.seq not in primer_for_blast:
+					nL += 1
+					pl.name = "L" + str(nL)
+					primer_for_blast[pl.seq] = pl.name # use seq as keys
+				else:
+					pl.name = primer_for_blast[pl.seq]
+				if pr.seq not in primer_for_blast:
+					nR += 1
+					pr.name = "R" + str(nR)
+					primer_for_blast[pr.seq] = pr.name # because a lot of same sequences
+				else:
+					pr.name = primer_for_blast[pl.seq]
 				pp.left = pl
 				pp.right = pr
 				final_primers[i] = pp
@@ -451,8 +469,8 @@ def kasp(seqfile):
 	for i, pp in final_primers.items():
 		pl = pp.left
 		pr = pp.right
-		outfile.write("\t".join([i, str(pp.product_size), "LEFT", pl.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, blast_hit.setdefault(pl.seq, "")]) + "\n")
-		outfile.write("\t".join([i, str(pp.product_size), "RIGHT", pr.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, blast_hit.setdefault(pl.seq, "")]) + "\n")
+		outfile.write("\t".join([i, str(pp.product_size), "LEFT", pl.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pl.name, blast_hit.setdefault(pl.name, "")]) + "\n")
+		outfile.write("\t".join([i, str(pp.product_size), "RIGHT", pr.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pr.name, blast_hit.setdefault(pr.name, "")]) + "\n")
 	
 	outfile.write("\n\nSites that can differ all in target " + target + "\n")
 	outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
