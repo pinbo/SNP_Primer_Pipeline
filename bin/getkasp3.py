@@ -455,7 +455,7 @@ def kasp(seqfile):
 					pr.name = "R" + str(nR)
 					primer_for_blast[pr.seq] = pr.name # because a lot of same sequences
 				else:
-					pr.name = primer_for_blast[pl.seq]
+					pr.name = primer_for_blast[pr.seq]
 				pp.left = pl
 				pp.right = pr
 				final_primers[i] = pp
