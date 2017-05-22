@@ -141,7 +141,7 @@ class Restriction_Enzyme(object):
 		self.allpos = [] # all the match positions in the template
 		self.change_pos = None
 
-	# classes
+# classes
 class Primers(object):
 	"""A primer set designed by Primer3"""
 	def __init__(self):
@@ -171,7 +171,6 @@ class PrimerPair(object):
 		self.penalty = "NA"
 		self.product_size = 0
 
-
 def parse_RE_file(RE_file):
 	REs = {}
 	with open(RE_file) as file_one:
@@ -184,10 +183,8 @@ def parse_RE_file(RE_file):
 def string_dif(s1, s2): # two strings with equal length
 	return [i for i in xrange(len(s1)) if s1[i] != s2[i]]
 
-
 def find_substring(substring, string): # find all the starting index of a substring
 	return [m.start() for m in re.finditer(substring, string)]
-
 
 def test_enzyme(enzyme, wild_seq, mut_seq): # enzyme is an Restriction_Enzyme object
 	enzyme_seq = enzyme.seq
@@ -290,6 +287,24 @@ def primer_blast(primer_for_blast, outfile_blast):
 			blast_hit[query] = blast_hit.setdefault(query, "") + ";" + subject + ":" + str(sstart)
 	return blast_hit
 
+# function to extract sequences from a fasta file 
+def get_fasta(infile):
+	fasta = {} # dictionary for alignment
+	with open(infile) as file_one:
+		for line in file_one:
+			line = line.strip()
+			if line.startswith(">"):
+				sequence_name = line.split()[0].lstrip(">")
+			else:
+				fasta.setdefault(sequence_name, "")
+				fasta[sequence_name] += line.rstrip()
+	return fasta
+
+
+
+
+
+
 # parse the flanking sequence input
 
 def caps(seqfile):
@@ -301,15 +316,9 @@ def caps(seqfile):
 	if not os.path.exists(directory):
 		os.makedirs(directory)
 	out = directory + "/selected_CAPS_primers_" + snpname + ".txt"
-	target = "2AS" # target sequence name
-	product_min = 50
-	product_max = 250
-	alt_allele = iupac[allele][0] # choose A or T
 	
 	# software path
 	primer3_path, muscle_path = get_software_path(getcaps_path)
-	#muscle_path = "muscle"
-	#primer3_path = "primer3_core"
 
 	########################
 	# STEP 0: create alignment file and primer3output file
@@ -323,15 +332,7 @@ def caps(seqfile):
 	snp_pos = int(pos) - 1 # 0-based
 	########################
 	# read alignment file
-	fasta = {} # dictionary for alignment
-
-	with open(RawAlignFile) as file_one:
-		for line in file_one:
-			if line.startswith(">"):
-				sequence_name = line.rstrip().lstrip(">")
-			else:
-				fasta.setdefault(sequence_name, "")
-				fasta[sequence_name] += line.rstrip()
+	fasta = get_fasta(RawAlignFile)
 
 	# get the variaiton site among sequences
 	ids = [] # all other sequence names
@@ -363,7 +364,6 @@ def caps(seqfile):
 	print "last key of a2t", i
 	
 	seq_template = fasta[target].replace("-","") # remove all gaps
-
 	variation = [] # variation sites that can differ ALL
 	variation2 = [] # variation sites that can differ at least 2 homeologs
 	
@@ -374,7 +374,6 @@ def caps(seqfile):
 	print "gap_left_target, gap_left and gap_right: ", gap_left_target, gap_left, gap_right
 	
 	diffarray = {} # a list of 0 or 1: the same as or different from the site in each sequences of ids
-	#for i in range(alignlen):
 	for i in range(gap_left, gap_right): # exclude 20 bases on each side
 		b1 = fasta[target][i]
 		if b1 == "-":  # target non-gap base
@@ -442,12 +441,6 @@ def caps(seqfile):
 	# primer3 inputfile
 	primer3input = directory + "/primer3.input." + snpname
 	p3input = open(primer3input, 'w')
-
-	#seq_template = fasta[target].replace("-","") # remove all gaps
-
-	# because A and T give lower Tm, so use them as template
-	if alt_allele in "ATat":
-		seq_template = seq_template[:snp_pos] +  alt_allele + seq_template[snp_pos + 1:]
 	# for dcaps
 	product_min = 220
 	product_max = 500

@@ -193,9 +193,26 @@ def primer_blast(primer_for_blast, outfile_blast):
 			blast_hit[query] = blast_hit.setdefault(query, "") + ";" + subject + ":" + str(sstart)
 	return blast_hit
 
+# function to extract sequences from a fasta file 
+def get_fasta(infile):
+	fasta = {} # dictionary for alignment
+	with open(infile) as file_one:
+		for line in file_one:
+			line = line.strip()
+			if line.startswith(">"):
+				sequence_name = line.split()[0].lstrip(">")
+			else:
+				fasta.setdefault(sequence_name, "")
+				fasta[sequence_name] += line.rstrip()
+	return fasta
+
+
+
+
 def kasp(seqfile):
 	#flanking_temp_marker_IWB1855_7A_R_251.fa
 	snpname, chrom, allele, pos =re.split("_|\.", seqfile)[3:7]
+	snp_site = int(pos) - 1 # 0-based
 	getkasp_path = os.path.dirname(os.path.realpath(__file__))
 	directory = "KASP_output"
 	if not os.path.exists(directory):
@@ -208,8 +225,6 @@ def kasp(seqfile):
 	
 	# software path
 	primer3_path, muscle_path = get_software_path(getkasp_path)
-	#muscle_path = "muscle"
-	#primer3_path = "primer3_core"
 
 	########################
 	# STEP 0: create alignment file and primer3output file
@@ -218,21 +233,9 @@ def kasp(seqfile):
 	print "Alignment command: ", alignmentcmd
 	call(alignmentcmd, shell=True)
 	
-	# Primer3 input and output
-	#outfile = open(out, 'w') # output file
-	snp_site = int(pos) - 1 # 0-based
 	########################
 	# read alignment file
-	fasta = {} # dictionary for alignment
-
-	with open(RawAlignFile) as file_one:
-		for line in file_one:
-			if line.startswith(">"):
-				sequence_name = line.rstrip().lstrip(">")
-			else:
-				fasta.setdefault(sequence_name, "")
-				fasta[sequence_name] += line.rstrip()
-
+	fasta = get_fasta(RawAlignFile)
 	# get the variaiton site among sequences
 	ids = [] # all other sequence names
 	for kk in fasta.keys():
@@ -320,9 +323,6 @@ def kasp(seqfile):
 	# primer3 inputfile
 	primer3input = directory + "/primer3.input." + snpname
 	p3input = open(primer3input, 'w')
-
-	#seq_template = fasta[target].replace("-","") # remove all gaps
-
 	# because A and T give lower Tm, so use them as template
 	if alt_allele in "ATat":
 		seq_template = seq_template[:snp_site] +  alt_allele + seq_template[snp_site + 1:]
@@ -419,7 +419,6 @@ def kasp(seqfile):
 	# write to file
 	outfile = open(out, 'w')
 	outfile.write("index\tproduct_size\ttype\tstart\tend\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\t3'differall\tpenalty\tcompl_any\tcompl_end\tPrimerID\tmatched_chromosomes\n")
-	#for pp in primerpairs:
 	# Get primer list for blast
 	primer_for_blast = {}
 	final_primers = {} # final primers for output
