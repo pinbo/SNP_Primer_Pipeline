@@ -442,8 +442,8 @@ def caps(seqfile):
 	primer3input = directory + "/primer3.input." + snpname
 	p3input = open(primer3input, 'w')
 	# for dcaps
-	product_min = 220
-	product_max = 500
+	product_min = 150
+	product_max = 350
 	n = 0 # number to see how many records were written to primer3 input file
 	for enzyme in dcaps_list:
 		for primer_end_pos in enzyme.primer_end_pos: # a list of potential end positions
