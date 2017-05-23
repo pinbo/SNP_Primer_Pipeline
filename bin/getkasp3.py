@@ -473,6 +473,7 @@ def kasp(seqfile):
 	
 	outfile.write("\n\nSites that can differ all in target " + target + "\n")
 	outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
+	outfile.write("\n\n\n")
 	outfile.close()
 
 # loop for all snp sequence files

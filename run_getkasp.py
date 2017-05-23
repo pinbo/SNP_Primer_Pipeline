@@ -29,6 +29,10 @@
 
 # example: run_getkasp.py for_polymarker.csv 3
 
+#########################
+from glob import glob
+
+
 def main(args):
 	polymarker_input = args[1]
 	genome_number =  args[2]
@@ -79,6 +83,18 @@ def main(args):
 	cmd9 = script_path + "getCAPS.py 1" # add blast option
 	print "Step 9: Get CAPS and dCAPS primers for each marker command:\n", cmd9
 	call(cmd9, shell=True)
+	
+	# step 10: concatenate output files
+	caps_files = glob("CAPS_output/selected_CAPS_primers*")
+	kasp_files = glob("KASP_output/selected_KASP_primers*")
+	alignment_files = glob("alignment_raw_*")
+	cmd10 = "cat CAPS_output/selected_CAPS_primers* > Potential_CAPS_primers.txt"
+	cmd11 = "cat KASP_output/selected_KASP_primers* > Potential_KASP_primers.txt"
+	cmd12 = "cat alignment_raw_* > All_alignment_raw.fa"
+	print "Concatenate all output files to single files\n", cmd10, "\n", cmd11, "\n", cmd12
+	call(cmd10, shell=True)
+	call(cmd11, shell=True)
+	call(cmd12, shell=True)
 	
 	print "\n\n\n KASP primers have been designed successfully!\n Check files beginning with 'select_primer' and CAPS_output.txt"
 	return 0

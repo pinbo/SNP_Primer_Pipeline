@@ -442,7 +442,7 @@ def caps(seqfile):
 	primer3input = directory + "/primer3.input." + snpname
 	p3input = open(primer3input, 'w')
 	# for dcaps
-	product_min = 150
+	product_min = 70
 	product_max = 350
 	n = 0 # number to see how many records were written to primer3 input file
 	for enzyme in dcaps_list:
@@ -632,6 +632,7 @@ def caps(seqfile):
 	for enzyme in dcaps_list + caps_list:
 		outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
 	# close outfile
+	outfile.write("\n\n\n")
 	outfile.close()
 
 # loop for all snp sequence files
