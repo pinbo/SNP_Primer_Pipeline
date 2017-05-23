@@ -1,0 +1,26 @@
+<tool id="snpmarker" name="SNP Primer Design">
+  <description>for each sequence in a CSV file</description>
+  <command interpreter="python">run_getkasp.py $input $ploidy</command>
+  <inputs>
+    <param format="txt" name="input" type="data" label="CSV file"/>
+    <param name="ploidy" size="4" type="integer" value="3" label="Ploidy"/>
+  </inputs>
+  <outputs>
+    <data format="txt" name="output">
+              <discover_datasets pattern="Potential_CAPS_primers.txt" format="tabular" directory="." visible="true" />
+              <discover_datasets pattern="Potential_KASP_primers.txt" format="tabular" directory="." visible="true" />
+              <discover_datasets pattern="All_alignment_raw.fa" format="fasta" directory="." visible="true" />
+    </data>
+  </outputs>
+
+  <help>
+
+**OVERVIEW**
+
+This pipeline can make KASP primers and CAPS/dCAPS primers based on SNP flanking sequences.
+
+The input file is the same as polymarker.
+
+  </help>
+
+</tool>
