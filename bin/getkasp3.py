@@ -462,7 +462,7 @@ def kasp(seqfile):
 	# blast primers
 	blast_hit = {}
 	outfile_blast = directory + "/primer_blast_out_" + target + ".txt"
-	if blast:
+	if blast and len(primer_for_blast) > 0:
 		blast_hit = primer_blast(primer_for_blast, outfile_blast) # chromosome hit for each primer
 	# write output file
 	for i, pp in final_primers.items():
