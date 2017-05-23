@@ -88,6 +88,7 @@ def main(args):
 	caps_files = glob("CAPS_output/selected_CAPS_primers*")
 	kasp_files = glob("KASP_output/selected_KASP_primers*")
 	alignment_files = glob("alignment_raw_*")
+	print "all output files are: ", caps_files
 	cmd10 = "cat CAPS_output/selected_CAPS_primers* > Potential_CAPS_primers.txt"
 	cmd11 = "cat KASP_output/selected_KASP_primers* > Potential_KASP_primers.txt"
 	cmd12 = "cat alignment_raw_* > All_alignment_raw.fa"
