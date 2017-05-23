@@ -316,6 +316,7 @@ def caps(seqfile):
 	if not os.path.exists(directory):
 		os.makedirs(directory)
 	out = directory + "/selected_CAPS_primers_" + snpname + ".txt"
+	print "Output selected CAPS file name is: ", out
 	
 	# software path
 	primer3_path, muscle_path = get_software_path(getcaps_path)
