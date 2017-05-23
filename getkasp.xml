@@ -7,9 +7,9 @@
   </inputs>
   <outputs>
     <data format="txt" name="output">
-              <discover_datasets pattern="Potential_CAPS_primers.txt" format="tabular" directory="." visible="true" />
-              <discover_datasets pattern="Potential_KASP_primers.txt" format="tabular" directory="." visible="true" />
-              <discover_datasets pattern="All_alignment_raw.fa" format="fasta" directory="." visible="true" />
+              <discover_datasets pattern="Potential_CAPS_primers.txt" format="tabular" directory="." visible="true" label="${tool.name} CAPS primer output"/>
+              <discover_datasets pattern="Potential_KASP_primers.txt" format="tabular" directory="." visible="true" label="${tool.name} KASP primer output"/>
+              <discover_datasets pattern="All_alignment_raw.fa" format="fasta" directory="." visible="true" label="${tool.name} Sequence Alignments"/>
     </data>
   </outputs>
 
