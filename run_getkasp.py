@@ -60,7 +60,7 @@ def main(args):
 	call(cmd4, shell=True)
 	
 	# step 5: get flanking sequences for each file
-	cmd5 = "find . -iname \"temp_marker*\" | xargs basename | xargs -I {} sh -c 'blastdbcmd -entry_batch {} -db " + reference + " > flanking_{}.fa'"
+	cmd5 = "find . -iname \"temp_marker*\" | xargs -n1 basename | xargs -I {} sh -c 'blastdbcmd -entry_batch {} -db " + reference + " > flanking_{}.fa'"
 	print "Step 5: Get flanking sequences for each marker command:\n", cmd5
 	call(cmd5, shell=True)
 	
