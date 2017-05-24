@@ -337,7 +337,7 @@ def kasp(seqfile):
 		if right_end - left_end > product_max - 35: # suppose both primers are 18 bp
 			continue
 		settings = "PRIMER_TASK=generic" + "\n" + \
-		"SEQUENCE_ID=" + target + "-" + str(i) + "\n" + \
+		"SEQUENCE_ID=" + snpname + "-" + str(i) + "\n" + \
 		"SEQUENCE_TEMPLATE=" + seq_template + "\n" + \
 		"PRIMER_PRODUCT_SIZE_RANGE=50-250" + "\n" + \
 		"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getkasp_path + "/primer3_config/"  + "\n" + \
@@ -461,7 +461,7 @@ def kasp(seqfile):
 					
 	# blast primers
 	blast_hit = {}
-	outfile_blast = directory + "/primer_blast_out_" + target + ".txt"
+	outfile_blast = directory + "/primer_blast_out_" + snpname + ".txt"
 	if blast and len(primer_for_blast) > 0:
 		blast_hit = primer_blast(primer_for_blast, outfile_blast) # chromosome hit for each primer
 	# write output file
@@ -471,7 +471,7 @@ def kasp(seqfile):
 		outfile.write("\t".join([i, str(pp.product_size), "LEFT", pl.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pl.name, blast_hit.setdefault(pl.name, "")]) + "\n")
 		outfile.write("\t".join([i, str(pp.product_size), "RIGHT", pr.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pr.name, blast_hit.setdefault(pr.name, "")]) + "\n")
 	
-	outfile.write("\n\nSites that can differ all in target " + target + "\n")
+	outfile.write("\n\nSites that can differ all for " + snpname + "\n")
 	outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
 	outfile.write("\n\n\n")
 	outfile.close()

@@ -458,7 +458,7 @@ def caps(seqfile):
 				if right_end - left_end < product_min - 35 or right_end - left_end > product_max - 35: # suppose both primers are 18 bp
 					continue
 				settings = "PRIMER_TASK=generic" + "\n" + \
-				"SEQUENCE_ID=" + target + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i) + "\n" + \
+				"SEQUENCE_ID=" + snpname + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i) + "\n" + \
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 				"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
@@ -485,7 +485,7 @@ def caps(seqfile):
 				left_end = -1000000
 				right_end = i + 1
 			settings = "PRIMER_TASK=generic" + "\n" + \
-			"SEQUENCE_ID=" + target + "-CAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i) + "\n" + \
+			"SEQUENCE_ID=" + snpname + "-CAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i) + "\n" + \
 			"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 			"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 			"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
@@ -507,7 +507,7 @@ def caps(seqfile):
 	if n == 0:
 		print "No primer3 input were found"
 		outfile = open(out, 'w')
-		outfile.write("Sites that can differ all in target " + target + "\n")
+		outfile.write("Sites that can differ all for " + snpname + "\n")
 		outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
 		outfile.write("\nCAPS cut information\n") # change to 1 based
 		outfile.write("Enzyme\tEnzyme_seq\tChange_pos\tOther_cut_pos\n")
@@ -610,7 +610,7 @@ def caps(seqfile):
 				
 	# blast primers
 	blast_hit = {}
-	outfile_blast = directory + "/primer_blast_out_" + target + ".txt"
+	outfile_blast = directory + "/primer_blast_out_" + snpname + ".txt"
 	if blast and len(primer_for_blast) > 0:
 		blast_hit = primer_blast(primer_for_blast, outfile_blast) # chromosome hit for each primer
 	# write output file
@@ -625,7 +625,7 @@ def caps(seqfile):
 		outfile.write("\t".join([i, str(pp.product_size), "LEFT", pl.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pl.name, blast_hit.setdefault(pl.name, "")]) + "\n")
 		outfile.write("\t".join([i, str(pp.product_size), "RIGHT", pr.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pr.name, blast_hit.setdefault(pr.name, "")]) + "\n")
 	
-	outfile.write("\n\nSites that can differ all in target " + target + "\n")
+	outfile.write("\n\nSites that can differ all for " + snpname + "\n")
 	outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
 	# write CAPS cut information
 	outfile.write("\n\nCAPS cut information\n") # change to 1 based
