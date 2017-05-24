@@ -6,9 +6,9 @@
     <param name="ploidy" size="4" type="integer" value="3" label="Ploidy"/>
   </inputs>
   <outputs>
-      <data format_source="tabular" name="caps_out" from_work_dir="Potential_CAPS_primers.txt" label="${tool.name} CAPS primer output"/>
-	  <data format_source="tabular" name="kasp_out" from_work_dir="Potential_KASP_primers.txt" label="${tool.name} KASP primer output"/>
-	  <data format_source="fasta" name="alignment_out" from_work_dir="All_alignment_raw.fa" label="${tool.name} Sequence Alignments"/>
+      <data format="tabular" name="caps_out" from_work_dir="Potential_CAPS_primers.txt" label="${tool.name} CAPS primer output"/>
+	  <data format="tabular" name="kasp_out" from_work_dir="Potential_KASP_primers.txt" label="${tool.name} KASP primer output"/>
+	  <data format="fasta" name="alignment_out" from_work_dir="All_alignment_raw.fa" label="${tool.name} Sequence Alignments"/>
   </outputs>
 
   <help>
