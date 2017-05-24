@@ -163,14 +163,14 @@ def mismatchn (s1, s2):
 # function to blast and parse the output of each primer in the wheat genome
 # depends on function: mismtachn
 def primer_blast(primer_for_blast, outfile_blast):
-	forblast = open("for_blast.fa", 'w') # for blast against the gnome
+	forblast = open("for_blast_primer.fa", 'w') # for blast against the gnome
 	for k, v in primer_for_blast.items(): # k is primer sequence and v is the number
 		forblast.write(">" + v + "\n" + k + "\n")
 	forblast.close()
 	blast_hit = {} # matched chromosomes for primers: less than 2 mismatches in the first 4 bps from 3'
 	### for blast
 	reference = "/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta"
-	cmd2 = 'blastn -task blastn -db ' + reference + ' -query for_blast.fa -outfmt "6 std qseq sseq qlen slen" -num_threads 3 -word_size 7 -out ' + outfile_blast
+	cmd2 = 'blastn -task blastn -db ' + reference + ' -query for_blast_primer.fa -outfmt "6 std qseq sseq qlen slen" -num_threads 3 -word_size 7 -out ' + outfile_blast
 	print "Step 2: Blast command:\n", cmd2
 	call(cmd2, shell=True)
 	# process blast file
@@ -206,12 +206,35 @@ def get_fasta(infile):
 				fasta[sequence_name] += line.rstrip()
 	return fasta
 
-
+# in case multiple hit in the same chromosome in the psudomolecule
+# the input fasta file are in order from the blast file
+def get_fasta2(infile, target_chrom):
+	fasta = {} # dictionary for alignment
+	target = ""
+	non_target_list = []
+	n = 0 # add a number in the chromosome name
+	with open(infile) as file_one:
+		for line in file_one:
+			line = line.strip()
+			if line.startswith(">"):
+				sequence_name = line.split()[0].lstrip(">")
+				sequence_name += "-" + str(n)
+				n += 1
+				if not target and target_chrom in sequence_name:
+					target = sequence_name
+				else:
+					non_target_list.append(sequence_name)
+			else:
+				fasta.setdefault(sequence_name, "")
+				fasta[sequence_name] += line.rstrip()
+			
+	return fasta, target, non_target_list
 
 
 def kasp(seqfile):
 	#flanking_temp_marker_IWB1855_7A_R_251.fa
 	snpname, chrom, allele, pos =re.split("_|\.", seqfile)[3:7]
+	chrom = chrom[0:2] # no arm
 	snp_site = int(pos) - 1 # 0-based
 	getkasp_path = os.path.dirname(os.path.realpath(__file__))
 	directory = "KASP_output"
@@ -235,15 +258,15 @@ def kasp(seqfile):
 	
 	########################
 	# read alignment file
-	fasta = get_fasta(RawAlignFile)
+	fasta, target, ids = get_fasta2(RawAlignFile, chrom)
 	# get the variaiton site among sequences
-	ids = [] # all other sequence names
-	for kk in fasta.keys():
-		key_chr = kk.split("_")[2] # sequence chromosome name
-		if chrom in key_chr or key_chr in chrom: # 3B contig names do not have chromosome arm
-			target = kk
-		else:
-			ids.append(kk)
+	#ids = [] # all other sequence names
+	#for kk in fasta.keys():
+		#key_chr = kk.split("_")[2] # sequence chromosome name
+		#if chrom in key_chr or key_chr in chrom: # 3B contig names do not have chromosome arm
+			#target = kk
+		#else:
+			#ids.append(kk)
 			
 	print "The target: ", target
 	print "The other groups: ", ids
