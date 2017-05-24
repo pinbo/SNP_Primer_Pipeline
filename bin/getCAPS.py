@@ -34,7 +34,7 @@ import getopt, sys, os, re
 from glob import glob
 #########################
 
-blast = sys.argv[1] # 0 or 1, whether to blast
+blast = int(sys.argv[1]) # 0 or 1, whether to blast
 # get all the raw sequences
 raw = glob("flanking_temp_marker*") # All file names start from "flanking"
 raw.sort()
@@ -343,11 +343,20 @@ def caps(seqfile):
 	
 	# software path
 	primer3_path, muscle_path = get_software_path(getcaps_path)
+	
+	# get target and ids and rename fasta seq names
+	fasta_raw, target, ids = get_fasta2(seqfile, chrom)
+	# write the renamed fasta seq to a file
+	seqfile2 = "renamed_" + seqfile
+	out_temp = open(seqfile2, "w")
+	for k, v in fasta_raw.items():
+		out_temp.write(">" + k + "\n" + v + "\n")
+	out_temp.close()
 
 	########################
 	# STEP 0: create alignment file and primer3output file
 	RawAlignFile = "alignment_raw_" + snpname + ".fa"
-	alignmentcmd = muscle_path + " -in " + seqfile + " -out " + RawAlignFile + " -quiet"
+	alignmentcmd = muscle_path + " -in " + seqfile2 + " -out " + RawAlignFile + " -quiet"
 	print "Alignment command: ", alignmentcmd
 	call(alignmentcmd, shell=True)
 	
@@ -356,7 +365,7 @@ def caps(seqfile):
 	snp_pos = int(pos) - 1 # 0-based
 	########################
 	# read alignment file
-	fasta, target, ids = get_fasta2(RawAlignFile, chrom)
+	fasta = get_fasta(RawAlignFile)
 
 	## get the variaiton site among sequences
 	#ids = [] # all other sequence names

@@ -79,7 +79,7 @@ for line in open(blast_file):
 	qchrom = qchrom[0:2] # no arm for pseudomolecule blast
 	#schrom = subject.split("_")[2] # subject chromosome name with arm
 	schrom = subject[-2:] # chr6A as in the pseudomolecule. No chromosome arm
-	print qchrom, schrom
+	#print qchrom, schrom
 	if schrom[1] not in genomes:
 		continue
 	pct_identity = float(fields[2])
