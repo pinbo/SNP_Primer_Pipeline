@@ -59,6 +59,11 @@ xstream = 500
 flanking = {} # flanking information
 snpinfo = {}
 
+# two list below to store the matched subjects in order
+# so I know which chromosme subject is the best hit
+snp_list = [] # snp name
+range_list = [] # range list for each subject
+
 # blast fields
 # IWB50236_7A_R	IWGSC_CSS_7DS_scaff_3919748	98.718	78	1	0	24	101	4891	4968	1.55e-30	138	CTCATCAAATGATTCAAAAATATCGATRCTTGGCTGGTGTATCGTGCAGACGACAGTTCGTCCGGTATCAACAGCATT	CTCATCAAATGATTCAAAAATATCGATGCTTGGCTGGTGTATCGTGCAGACGACAGTTCGTCCGGTATCAACAGCATT	5924
 # Fields: 
@@ -71,7 +76,10 @@ for line in open(blast_file):
 	fields = line.split("\t")
 	query, subject = fields[:2]
 	snp, qchrom = query.split("_")[0:2] # snp name, query chromosome name
-	schrom = subject.split("_")[2] # subject chromosome name with arm
+	qchrom = qchrom[0:2] # no arm for pseudomolecule blast
+	#schrom = subject.split("_")[2] # subject chromosome name with arm
+	schrom = subject[-2:] # chr6A as in the pseudomolecule. No chromosome arm
+	print qchrom, schrom
 	if schrom[1] not in genomes:
 		continue
 	pct_identity = float(fields[2])
@@ -114,14 +122,22 @@ for line in open(blast_file):
 	
 		if qchrom == schrom:
 			snpinfo[query] = query + "_" + str(pos2)
-		flanking[query + "-" + subject] = "\t".join([subject, str(up) + "-" + str(down), strand])
-		#out.write("\t".join([query + "_" + str(pos2), subject, str(up) + "-" + str(down), strand]) + "\n")
+		#flanking[query + "-" + subject] = "\t".join([subject, str(up) + "-" + str(down), strand])
+		#flanking[query + "-" + subject + "-" + str(sstart)] = "\t".join([subject, str(up) + "-" + str(down), strand])
+		snp_list.append(query)
+		range_list.append("\t".join([subject, str(up) + "-" + str(down), strand]))
+
 
 # output
 out = open(outfile, "w")
 
-for k, v in flanking.items():
-	k2 = k.split("-")[0] # key for snpinfo
-	out.write(snpinfo[k2] + "\t" + v + "\n")
+for i in range(len(snp_list)):
+	snp = snp_list[i]
+	rg = range_list[i]
+	out.write(snpinfo[snp] + "\t" + rg + "\n")
+
+#for k, v in flanking.items():
+#	k2 = k.split("-")[0] # key for snpinfo
+#	out.write(snpinfo[k2] + "\t" + v + "\n")
 	
 out.close()
