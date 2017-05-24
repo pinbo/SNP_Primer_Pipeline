@@ -88,6 +88,13 @@ def main(args):
 	caps_files = glob("CAPS_output/selected_CAPS_primers*")
 	kasp_files = glob("KASP_output/selected_KASP_primers*")
 	alignment_files = glob("alignment_raw_*")
+	with open("All_alignment_raw.fa", "w") as outfile:
+		for f in alignment_files:
+			with open(f) as infile:
+				outfile.write(f + "\n")
+				outfile.write(infile.read())
+				outfile.write("\n\n")
+	outfile.close()
 	print "all output files are: ", caps_files
 	cmd10 = "cat CAPS_output/selected_CAPS_primers* > Potential_CAPS_primers.tsv"
 	cmd11 = "cat KASP_output/selected_KASP_primers* > Potential_KASP_primers.tsv"
@@ -95,7 +102,7 @@ def main(args):
 	print "Concatenate all output files to single files\n", cmd10, "\n", cmd11, "\n", cmd12
 	call(cmd10, shell=True)
 	call(cmd11, shell=True)
-	call(cmd12, shell=True)
+	#call(cmd12, shell=True)
 	
 	print "\n\n\n KASP primers have been designed successfully!\n Check files beginning with 'select_primer' and CAPS_output.txt"
 	return 0
