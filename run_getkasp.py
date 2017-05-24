@@ -89,8 +89,8 @@ def main(args):
 	kasp_files = glob("KASP_output/selected_KASP_primers*")
 	alignment_files = glob("alignment_raw_*")
 	print "all output files are: ", caps_files
-	cmd10 = "cat CAPS_output/selected_CAPS_primers* > Potential_CAPS_primers.txt"
-	cmd11 = "cat KASP_output/selected_KASP_primers* > Potential_KASP_primers.txt"
+	cmd10 = "cat CAPS_output/selected_CAPS_primers* > Potential_CAPS_primers.tsv"
+	cmd11 = "cat KASP_output/selected_KASP_primers* > Potential_KASP_primers.tsv"
 	cmd12 = "cat alignment_raw_* > All_alignment_raw.fa"
 	print "Concatenate all output files to single files\n", cmd10, "\n", cmd11, "\n", cmd12
 	call(cmd10, shell=True)
