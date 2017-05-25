@@ -533,11 +533,11 @@ def caps(seqfile):
 		if n == 0:
 			print "No primer3 input were found"
 			outfile = open(out, 'w')
-			outfile.write("\nCAPS cut information\n") # change to 1 based
+			outfile.write("\nCAPS cut information for SNP " + snpname + "\n") # change to 1 based
 			outfile.write("Enzyme\tEnzyme_seq\tChange_pos\tOther_cut_pos\n")
 			for enzyme in caps_list:
 				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
-			outfile.write("\ndCAPS cut information\n") # change to 1 based
+			outfile.write("\ndCAPS cut information for SNP " + snpname + "\n") # change to 1 based
 			for enzyme in dcaps_list:
 				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
 			outfile.close()
@@ -712,11 +712,11 @@ def caps(seqfile):
 			outfile = open(out, 'w')
 			outfile.write("Sites that can differ all for " + snpname + "\n")
 			outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
-			outfile.write("\nCAPS cut information\n") # change to 1 based
+			outfile.write("\nCAPS cut information for SNP " + snpname + "\n") # change to 1 based
 			outfile.write("Enzyme\tEnzyme_seq\tChange_pos\tOther_cut_pos\n")
 			for enzyme in caps_list:
 				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
-			outfile.write("\ndCAPS cut information\n") # change to 1 based
+			outfile.write("\ndCAPS cut information for SNP " + snpname + "\n") # change to 1 based
 			for enzyme in dcaps_list:
 				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
 			outfile.close()
@@ -781,7 +781,7 @@ def caps(seqfile):
 	outfile.write("\n\nSites that can differ all for " + snpname + "\n")
 	outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
 	# write CAPS cut information
-	outfile.write("\n\nCAPS cut information\n") # change to 1 based
+	outfile.write("\n\nCAPS cut information for snp " + snpname + "\n") # change to 1 based
 	outfile.write("Enzyme\tEnzyme_seq\tChange_pos\tOther_cut_pos\n")
 	for enzyme in dcaps_list + caps_list:
 		outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")

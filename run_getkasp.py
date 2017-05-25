@@ -71,14 +71,14 @@ def main(args):
 	call(cmd6, shell=True)
 	
 	# step 7: parse the for_polymarker input and create the input for SNP2CAPS
-	cmd7 = script_path + "parse_polymarker_input_for_CAPS.py " + polymarker_input
-	print "Step 7: Create input file for SNP2CAPS:\n", cmd7
-	call(cmd7, shell=True)
+	#cmd7 = script_path + "parse_polymarker_input_for_CAPS.py " + polymarker_input
+	#print "Step 7: Create input file for SNP2CAPS:\n", cmd7
+	#call(cmd7, shell=True)
 	
 	# step 8: run SNP2CAPS script to find all potential Restriciton enzymes
-	cmd8 = script_path + "SNP2CAPS.pl for_SNP2CAPS.fa " + script_path + "REgcg.txt EcoRV,BamHI > CAPS_output.txt"
-	print "Step 8: run SNP2CAPS script to find all potential Restriciton enzymes:\n", cmd8
-	call(cmd8, shell=True)
+	#cmd8 = script_path + "SNP2CAPS.pl for_SNP2CAPS.fa " + script_path + "REgcg.txt EcoRV,BamHI > CAPS_output.txt"
+	#print "Step 8: run SNP2CAPS script to find all potential Restriciton enzymes:\n", cmd8
+	#call(cmd8, shell=True)
 	
 	# step 9: get CAPS markers
 	cmd9 = script_path + "getCAPS.py 1" # add blast option
