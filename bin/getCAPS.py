@@ -324,7 +324,100 @@ def get_fasta2(infile, target_chrom):
 			
 	return fasta, target, non_target_list
 
-
+# parse primer3 output
+def parse_primer3output(primer3output, primerpair_to_return):
+	regex = "012345"[:primerpair_to_return]
+	regex = "([" + regex + "])"
+	primerpairs= {}
+	with open(primer3output) as infile:
+		for line in infile:
+			line = line.strip()
+			if "SEQUENCE_ID" in line:
+				seqid = line.split("=")[1]
+				for i in range(0, primerpair_to_return):
+					primerpairs[seqid + "-" + str(i)] = PrimerPair()
+				continue
+			elif re.search("PRIMER_PAIR_" + regex + "_PENALTY", line):
+				mm = re.search("PRIMER_PAIR_" + regex + "_PENALTY", line)
+				primerpairs[seqid + "-" + mm.group(1)].penalty = line.split("=")[1]
+				continue
+			elif re.search( "PRIMER_PAIR_" + regex + "_COMPL_ANY", line):
+				mm = re.search( "PRIMER_PAIR_" + regex + "_COMPL_ANY", line)
+				primerpairs[seqid + "-" + mm.group(1)].compl_any = line.split("=")[1]
+				continue
+			elif re.search( "PRIMER_PAIR_" + regex + "_COMPL_END", line):
+				mm = re.search( "PRIMER_PAIR_" + regex + "_COMPL_END", line)
+				primerpairs[seqid + "-" + mm.group(1)].compl_end = line.split("=")[1]
+			elif re.search( "PRIMER_PAIR_" + regex + "_PRODUCT_SIZE", line):
+				mm = re.search( "PRIMER_PAIR_" + regex + "_PRODUCT_SIZE", line)
+				primerpairs[seqid + "-" + mm.group(1)].product_size = int(line.split("=")[1])
+				continue
+			elif re.search( "PRIMER_LEFT_" + regex + "_SEQUENCE", line):
+				re.search( "PRIMER_LEFT_" + regex + "_SEQUENCE", line)
+				primerpairs[seqid + "-" + mm.group(1)].left.seq = line.split("=")[1]
+				continue
+			elif re.search( "PRIMER_LEFT_" + regex + "=", line):
+				mm = re.search( "PRIMER_LEFT_" + regex + "=", line)
+				primerpairs[seqid + "-" + mm.group(1)].left.start = int(line.split("=")[1].split(",")[0])
+				primerpairs[seqid + "-" + mm.group(1)].left.length = int(line.split("=")[1].split(",")[1])
+				primerpairs[seqid + "-" + mm.group(1)].left.end = primerpairs[seqid + "-" + mm.group(1)].left.start + primerpairs[seqid + "-" + mm.group(1)].left.length - 1
+				continue
+			elif re.search( "PRIMER_LEFT_" + regex + "_TM", line):
+				mm = re.search( "PRIMER_LEFT_" + regex + "_TM", line)
+				primerpairs[seqid + "-" + mm.group(1)].left.tm = float(line.split("=")[1])
+				continue
+			elif re.search( "PRIMER_LEFT_" + regex + "_GC_PERCENT", line):
+				mm = re.search( "PRIMER_LEFT_" + regex + "_GC_PERCENT", line)
+				primerpairs[seqid + "-" + mm.group(1)].left.gc = float(line.split("=")[1])
+			elif re.search( "PRIMER_LEFT_" + regex + "_SELF_ANY_TH", line):
+				mm = re.search( "PRIMER_LEFT_" + regex + "_SELF_ANY_TH", line)
+				primerpairs[seqid + "-" + mm.group(1)].left.anys = float(line.split("=")[1])
+				continue
+			elif re.search( "PRIMER_LEFT_" + regex + "_SELF_END_TH", line):
+				mm = re.search( "PRIMER_LEFT_" + regex + "_SELF_END_TH", line)
+				primerpairs[seqid + "-" + mm.group(1)].left.three = float(line.split("=")[1])
+				continue
+			elif re.search( "PRIMER_LEFT_" + regex + "_HAIRPIN_TH", line):
+				mm = re.search( "PRIMER_LEFT_" + regex + "_HAIRPIN_TH", line)
+				primerpairs[seqid + "-" + mm.group(1)].left.hairpin = float(line.split("=")[1])
+			elif re.search( "PRIMER_LEFT_" + regex + "_END_STABILITY", line):
+				mm = re.search( "PRIMER_LEFT_" + regex + "_END_STABILITY", line)
+				primerpairs[seqid + "-" + mm.group(1)].left.end_stability = float(line.split("=")[1])
+				continue
+			elif re.search( "PRIMER_RIGHT_" + regex + "_SEQUENCE", line):
+				mm = re.search( "PRIMER_RIGHT_" + regex + "_SEQUENCE", line)
+				primerpairs[seqid + "-" + mm.group(1)].right.seq = line.split("=")[1]
+			elif re.search( "PRIMER_RIGHT_" + regex + "=", line):
+				mm = re.search( "PRIMER_RIGHT_" + regex + "=", line)
+				primerpairs[seqid + "-" + mm.group(1)].right.start = int(line.split("=")[1].split(",")[0])
+				primerpairs[seqid + "-" + mm.group(1)].right.length = int(line.split("=")[1].split(",")[1])
+				primerpairs[seqid + "-" + mm.group(1)].right.end = primerpairs[seqid + "-" + mm.group(1)].right.start - primerpairs[seqid + "-" + mm.group(1)].right.length + 1
+				continue
+			elif re.search( "PRIMER_RIGHT_" + regex + "_TM", line):
+				mm = re.search( "PRIMER_RIGHT_" + regex + "_TM", line)
+				primerpairs[seqid + "-" + mm.group(1)].right.tm = float(line.split("=")[1])
+				continue
+			elif re.search( "PRIMER_RIGHT_" + regex + "_GC_PERCENT", line):
+				mm = re.search( "PRIMER_RIGHT_" + regex + "_GC_PERCENT", line)
+				primerpairs[seqid + "-" + mm.group(1)].right.gc = float(line.split("=")[1])
+				continue
+			elif re.search( "PRIMER_RIGHT_" + regex + "_SELF_ANY_TH", line):
+				mm = re.search( "PRIMER_RIGHT_" + regex + "_SELF_ANY_TH", line)
+				primerpairs[seqid + "-" + mm.group(1)].right.anys = float(line.split("=")[1])
+				continue
+			elif re.search( "PRIMER_RIGHT_" + regex + "_SELF_END_TH", line):
+				mm = re.search( "PRIMER_RIGHT_" + regex + "_SELF_END_TH", line)
+				primerpairs[seqid + "-" + mm.group(1)].right.three = float(line.split("=")[1])
+				continue
+			elif re.search( "PRIMER_RIGHT_" + regex + "_HAIRPIN_TH", line):
+				mm = re.search( "PRIMER_RIGHT_" + regex + "_HAIRPIN_TH", line)
+				primerpairs[seqid + "-" + mm.group(1)].right.hairpin = float(line.split("=")[1])
+				continue
+			elif re.search( "PRIMER_RIGHT_" + regex + "_END_STABILITY", line):
+				mm = re.search( "PRIMER_RIGHT_" + regex + "_END_STABILITY", line)
+				primerpairs[seqid + "-" + mm.group(1)].right.end_stability = float(line.split("=")[1])
+				continue
+	return primerpairs
 
 
 # parse the flanking sequence input
@@ -333,6 +426,7 @@ def caps(seqfile):
 	#flanking_temp_marker_IWB1855_7A_R_251.fa
 	snpname, chrom, allele, pos =re.split("_|\.", seqfile)[3:7]
 	chrom = chrom[0:2] # no arm
+	snp_pos = int(pos) - 1 # 0-based
 	print "snpname, chrom, allele, pos ", snpname, chrom, allele, pos
 	getcaps_path = os.path.dirname(os.path.realpath(__file__))
 	directory = "CAPS_output"
@@ -352,104 +446,8 @@ def caps(seqfile):
 	for k, v in fasta_raw.items():
 		out_temp.write(">" + k + "\n" + v + "\n")
 	out_temp.close()
-
-	########################
-	# STEP 0: create alignment file and primer3output file
-	RawAlignFile = "alignment_raw_" + snpname + ".fa"
-	alignmentcmd = muscle_path + " -in " + seqfile2 + " -out " + RawAlignFile + " -quiet"
-	print "Alignment command: ", alignmentcmd
-	call(alignmentcmd, shell=True)
-	
-	# Primer3 input and output
-	#outfile = open(out, 'w') # output file
-	snp_pos = int(pos) - 1 # 0-based
-	########################
-	# read alignment file
-	fasta = get_fasta(RawAlignFile)
-
-	## get the variaiton site among sequences
-	#ids = [] # all other sequence names
-	#for kk in fasta.keys():
-		#key_chr = kk.split("_")[2] # sequence chromosome name
-		#if chrom in key_chr or key_chr in chrom: # 3B contig names do not have chromosome arm
-			#target = kk
-		#else:
-			#ids.append(kk)
-			
-	print "The target: ", target
-	print "The other groups: ", ids
-
-	alignlen = len(fasta[target])
-	print "Alignment length: ", alignlen
-	
-	# get the target ID template base coordinate in the alignment
-	t2a = {} # template to alignment
-	a2t = {}
-	ngap = 0 # gaps
-	for i in range(alignlen):
-		if fasta[target][i] == "-":
-			ngap += 1
-			continue
-		t2a[i - ngap] = i
-		a2t[i] = i - ngap
-
-	print "last key of t2a", i - ngap
-	print "last key of a2t", i
-	
-	seq_template = fasta[target].replace("-","") # remove all gaps
-	variation = [] # variation sites that can differ ALL
-	variation2 = [] # variation sites that can differ at least 2 homeologs
-	
-	# calculate gap number on the left and right
-	gap_left_target = len(fasta[target]) - len(fasta[target].lstrip('-'))
-	gap_left = max([len(v) - len(v.lstrip('-')) for k, v in fasta.items()])
-	gap_right = min([len(v.rstrip('-')) for k, v in fasta.items()])
-	print "gap_left_target, gap_left and gap_right: ", gap_left_target, gap_left, gap_right
-	
-	diffarray = {} # a list of 0 or 1: the same as or different from the site in each sequences of ids
-	for i in range(gap_left, gap_right): # exclude 20 bases on each side
-		b1 = fasta[target][i]
-		if b1 == "-":  # target non-gap base
-			ngap += 1
-			continue
-		pos_template = a2t[i] # position in the target template (no gaps)
-		if pos_template < 20 or pos_template > len(seq_template) - 20:
-			continue
-		nd = 0 # number of difference
-		da = [0] * len(ids) # differ array
-		m = 0 # counter of next loop
-		if pos_template < snp_pos:
-			align_left = t2a[pos_template - 19] # 20 bp left of current position
-			align_right = i
-		else:
-			align_left = i # 20 bp left of current position
-			align_right = t2a[pos_template + 19]
-		seq2comp = get_homeo_seq(fasta, target, ids, align_left, align_right) # list of sequences for comparison
-		for k in seq2comp:
-			if pos_template < snp_pos:
-				b2 = k[-1] # homeolog non-gap bas
-			else:
-				b2 = k[0]
-			if b1 != b2:
-				nd += 1
-				da[m] = 1 # m sequence has variation from target
-			m += 1
-
-		# for each site pos_template
-		diffarray[pos_template] = da
-		if nd == len(ids): # different from all other sequences
-			if pos_template not in variation: # in case multiple gaps
-				variation.append(pos_template)
-		if nd > 0: # different from at least 1 other sequence
-			if pos_template not in variation2: # in case multiple gaps
-				variation2.append(pos_template)
-	
-	print "Sites that can differ all\n", variation
-	print "\nSites that can differ at least 1\n", variation2
-	#print "\nKeys of diffarray: ", diffarray.keys()
-	
-	############################################################
-	################ Get CAPS information ######################
+	seq_template = fasta_raw[target]
+	################## Get CAPS information
 	# step 1: read the enzyme file
 	RE_file = getcaps_path + "/striderc.403.parsed_JZ.txt" # this one removed some duplicated cuttings
 	REs = parse_RE_file(RE_file) # get the list of restriction enzymes
@@ -468,29 +466,30 @@ def caps(seqfile):
 			dcaps_list.append(enzyme)
 	print "caps_list is ", caps_list
 	print "dcaps_list is ", [x.name for x in dcaps_list]
-	
-	########################################################
-	# loop to write primer3 input for each variation site
-	# primer3 inputfile
-	primer3input = directory + "/primer3.input." + snpname
-	p3input = open(primer3input, 'w')
-	# for dcaps
-	product_min = 70
-	product_max = 350
-	n = 0 # number to see how many records were written to primer3 input file
-	for enzyme in dcaps_list:
-		for primer_end_pos in enzyme.primer_end_pos: # a list of potential end positions
-			for i in variation:
+	variation = [] # variation sites that can differ ALL
+	variation2 = [] # variation sites that can differ at least 2 homeologs
+	#########################
+	if not len(ids): # if there is no homeologs found, such as when ploidy is 1
+		# loop to write primer3 input for each variation site
+		# primer3 inputfile
+		primer3input = directory + "/primer3.input." + snpname
+		p3input = open(primer3input, 'w')
+		# for dcaps
+		product_min = 70
+		product_max = 350
+		n = 0 # number to see how many records were written to primer3 input file
+		for enzyme in dcaps_list:
+			for primer_end_pos in enzyme.primer_end_pos: # a list of potential end positions
 				if primer_end_pos > snp_pos:
-					left_end = i + 1
+					left_end = -1000000
 					right_end = primer_end_pos + 1
 				else:
 					left_end = primer_end_pos + 1
-					right_end = i + 1
+					right_end = -1000000
 				if right_end - left_end < product_min - 35 or right_end - left_end > product_max - 35: # suppose both primers are 18 bp
 					continue
 				settings = "PRIMER_TASK=generic" + "\n" + \
-				"SEQUENCE_ID=" + snpname + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i) + "\n" + \
+				"SEQUENCE_ID=" + snpname + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(primer_end_pos) + "\n" + \
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 				"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
@@ -505,19 +504,14 @@ def caps(seqfile):
 				"="
 				n += 1
 				p3input.write(settings + "\n")
-	# for caps
-	product_min = 300
-	product_max = 900
-	for enzyme in caps_list:
-		for i in variation: # sites that can differ all
-			if i < snp_pos:
-				left_end = i + 1
-				right_end = -1000000
-			else:
-				left_end = -1000000
-				right_end = i + 1
+		# for caps
+		product_min = 300
+		product_max = 900
+		left_end = -1000000
+		right_end = -1000000
+		for enzyme in caps_list:
 			settings = "PRIMER_TASK=generic" + "\n" + \
-			"SEQUENCE_ID=" + snpname + "-CAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i) + "\n" + \
+			"SEQUENCE_ID=" + snpname + "-CAPS-" + enzyme.name + "-" + enzyme.seq  + "\n" + \
 			"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 			"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 			"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
@@ -534,84 +528,211 @@ def caps(seqfile):
 			n += 1
 			p3input.write(settings + "\n")	
 
-	p3input.close()
-	
-	if n == 0:
-		print "No primer3 input were found"
-		outfile = open(out, 'w')
-		outfile.write("Sites that can differ all for " + snpname + "\n")
-		outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
-		outfile.write("\nCAPS cut information\n") # change to 1 based
-		outfile.write("Enzyme\tEnzyme_seq\tChange_pos\tOther_cut_pos\n")
-		for enzyme in caps_list:
-			outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
-		outfile.write("\ndCAPS cut information\n") # change to 1 based
+		p3input.close()
+		
+		if n == 0:
+			print "No primer3 input were found"
+			outfile = open(out, 'w')
+			outfile.write("\nCAPS cut information\n") # change to 1 based
+			outfile.write("Enzyme\tEnzyme_seq\tChange_pos\tOther_cut_pos\n")
+			for enzyme in caps_list:
+				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
+			outfile.write("\ndCAPS cut information\n") # change to 1 based
+			for enzyme in dcaps_list:
+				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
+			outfile.close()
+			return 0
+		# primer3 output file
+		primer3output = directory + "/primer3.output." + snpname
+		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " " + primer3input
+		print "Primer3 command 1st time: ", p3cmd
+		call(p3cmd, shell=True)
+		primerpairs = parse_primer3output(primer3output, 5)
+	else: # if there are homeolog sequences	
+	########################
+		# STEP 0: create alignment file and primer3output file
+		RawAlignFile = "alignment_raw_" + snpname + ".fa"
+		alignmentcmd = muscle_path + " -in " + seqfile2 + " -out " + RawAlignFile + " -quiet"
+		print "Alignment command: ", alignmentcmd
+		call(alignmentcmd, shell=True)
+		########################
+		# read alignment file
+		fasta = get_fasta(RawAlignFile)
+
+		## get the variaiton site among sequences
+		#ids = [] # all other sequence names
+		#for kk in fasta.keys():
+			#key_chr = kk.split("_")[2] # sequence chromosome name
+			#if chrom in key_chr or key_chr in chrom: # 3B contig names do not have chromosome arm
+				#target = kk
+			#else:
+				#ids.append(kk)
+				
+		print "The target: ", target
+		print "The other groups: ", ids
+
+		alignlen = len(fasta[target])
+		print "Alignment length: ", alignlen
+		
+		# get the target ID template base coordinate in the alignment
+		t2a = {} # template to alignment
+		a2t = {}
+		ngap = 0 # gaps
+		for i in range(alignlen):
+			if fasta[target][i] == "-":
+				ngap += 1
+				continue
+			t2a[i - ngap] = i
+			a2t[i] = i - ngap
+
+		print "last key of t2a", i - ngap
+		print "last key of a2t", i
+		
+		seq_template = fasta[target].replace("-","") # remove all gaps
+		variation = [] # variation sites that can differ ALL
+		variation2 = [] # variation sites that can differ at least 2 homeologs
+		
+		# calculate gap number on the left and right
+		gap_left_target = len(fasta[target]) - len(fasta[target].lstrip('-'))
+		gap_left = max([len(v) - len(v.lstrip('-')) for k, v in fasta.items()])
+		gap_right = min([len(v.rstrip('-')) for k, v in fasta.items()])
+		print "gap_left_target, gap_left and gap_right: ", gap_left_target, gap_left, gap_right
+		
+		diffarray = {} # a list of 0 or 1: the same as or different from the site in each sequences of ids
+		for i in range(gap_left, gap_right): # exclude 20 bases on each side
+			b1 = fasta[target][i]
+			if b1 == "-":  # target non-gap base
+				ngap += 1
+				continue
+			pos_template = a2t[i] # position in the target template (no gaps)
+			if pos_template < 20 or pos_template > len(seq_template) - 20:
+				continue
+			nd = 0 # number of difference
+			da = [0] * len(ids) # differ array
+			m = 0 # counter of next loop
+			if pos_template < snp_pos:
+				align_left = t2a[pos_template - 19] # 20 bp left of current position
+				align_right = i
+			else:
+				align_left = i # 20 bp left of current position
+				align_right = t2a[pos_template + 19]
+			seq2comp = get_homeo_seq(fasta, target, ids, align_left, align_right) # list of sequences for comparison
+			for k in seq2comp:
+				if pos_template < snp_pos:
+					b2 = k[-1] # homeolog non-gap bas
+				else:
+					b2 = k[0]
+				if b1 != b2:
+					nd += 1
+					da[m] = 1 # m sequence has variation from target
+				m += 1
+
+			# for each site pos_template
+			diffarray[pos_template] = da
+			if nd == len(ids): # different from all other sequences
+				if pos_template not in variation: # in case multiple gaps
+					variation.append(pos_template)
+			if nd > 0: # different from at least 1 other sequence
+				if pos_template not in variation2: # in case multiple gaps
+					variation2.append(pos_template)
+		
+		print "Sites that can differ all\n", variation
+		print "\nSites that can differ at least 1\n", variation2
+		#print "\nKeys of diffarray: ", diffarray.keys()
+		
+		########################################################
+		# loop to write primer3 input for each variation site
+		# primer3 inputfile
+		primer3input = directory + "/primer3.input." + snpname
+		p3input = open(primer3input, 'w')
+		# for dcaps
+		product_min = 70
+		product_max = 350
+		n = 0 # number to see how many records were written to primer3 input file
 		for enzyme in dcaps_list:
-			outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
-		outfile.close()
-		return 0
-	# primer3 output file
-	primer3output = directory + "/primer3.output." + snpname
-	p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " " + primer3input
-	print "Primer3 command 1st time: ", p3cmd
-	call(p3cmd, shell=True)
+			for primer_end_pos in enzyme.primer_end_pos: # a list of potential end positions
+				for i in variation:
+					if primer_end_pos > snp_pos:
+						left_end = i + 1
+						right_end = primer_end_pos + 1
+					else:
+						left_end = primer_end_pos + 1
+						right_end = i + 1
+					if right_end - left_end < product_min - 35 or right_end - left_end > product_max - 35: # suppose both primers are 18 bp
+						continue
+					settings = "PRIMER_TASK=generic" + "\n" + \
+					"SEQUENCE_ID=" + snpname + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i) + "-" + str(primer_end_pos) + "\n" + \
+					"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
+					"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
+					"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
+					"PRIMER_MAX_SIZE=25" + "\n" + \
+					"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
+					"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
+					"PRIMER_LIBERAL_BASE=1" + "\n" + \
+					"PRIMER_NUM_RETURN=5"  + "\n" + \
+					"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
+					"SEQUENCE_FORCE_LEFT_END=" + str(left_end) + "\n" + \
+					"SEQUENCE_FORCE_RIGHT_END=" + str(right_end) + "\n" + \
+					"="
+					n += 1
+					p3input.write(settings + "\n")
+		# for caps
+		product_min = 300
+		product_max = 900
+		for enzyme in caps_list:
+			for i in variation: # sites that can differ all
+				if i < snp_pos:
+					left_end = i + 1
+					right_end = -1000000
+				else:
+					left_end = -1000000
+					right_end = i + 1
+				settings = "PRIMER_TASK=generic" + "\n" + \
+				"SEQUENCE_ID=" + snpname + "-CAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i) + "\n" + \
+				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
+				"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
+				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
+				"PRIMER_MAX_SIZE=25" + "\n" + \
+				"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
+				"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
+				"PRIMER_LIBERAL_BASE=1" + "\n" + \
+				"PRIMER_NUM_RETURN=5"  + "\n" + \
+				"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
+				"SEQUENCE_FORCE_LEFT_END=" + str(left_end) + "\n" + \
+				"SEQUENCE_FORCE_RIGHT_END=" + str(right_end) + "\n" + \
+				"SEQUENCE_TARGET=" + str(snp_pos - 20) + ",40" + "\n" + \
+				"="
+				n += 1
+				p3input.write(settings + "\n")	
 
-	##########################
-	### parse primer 3 primer check output
-	primerpairs = {} # sequence ID is the key
+		p3input.close()
+		
+		if n == 0:
+			print "No primer3 input were found"
+			outfile = open(out, 'w')
+			outfile.write("Sites that can differ all for " + snpname + "\n")
+			outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
+			outfile.write("\nCAPS cut information\n") # change to 1 based
+			outfile.write("Enzyme\tEnzyme_seq\tChange_pos\tOther_cut_pos\n")
+			for enzyme in caps_list:
+				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
+			outfile.write("\ndCAPS cut information\n") # change to 1 based
+			for enzyme in dcaps_list:
+				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
+			outfile.close()
+			return 0
+		# primer3 output file
+		primer3output = directory + "/primer3.output." + snpname
+		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " " + primer3input
+		print "Primer3 command 1st time: ", p3cmd
+		call(p3cmd, shell=True)
 
-	with open(primer3output) as infile:
-		for line in infile:
-			line = line.strip()
-			if "SEQUENCE_ID" in line:
-				seqid = line.split("=")[1]
-				primerpairs[seqid] = PrimerPair()
-			elif "PRIMER_PAIR_0_PENALTY" in line:
-				primerpairs[seqid].penalty = line.split("=")[1]
-			elif "PRIMER_PAIR_0_COMPL_ANY" in line:
-				primerpairs[seqid].compl_any = line.split("=")[1]
-			elif "PRIMER_PAIR_0_COMPL_END" in line:
-				primerpairs[seqid].compl_end = line.split("=")[1]
-			elif "PRIMER_PAIR_0_PRODUCT_SIZE" in line:
-				primerpairs[seqid].product_size = int(line.split("=")[1])
-			elif "PRIMER_LEFT_0_SEQUENCE" in line:
-				primerpairs[seqid].left.seq = line.split("=")[1]
-			elif "PRIMER_LEFT_0=" in line:
-				primerpairs[seqid].left.start = int(line.split("=")[1].split(",")[0])
-				primerpairs[seqid].left.length = int(line.split("=")[1].split(",")[1])
-				primerpairs[seqid].left.end = primerpairs[seqid].left.start + primerpairs[seqid].left.length - 1
-			elif "PRIMER_LEFT_0_TM" in line:
-				primerpairs[seqid].left.tm = float(line.split("=")[1])
-			elif "PRIMER_LEFT_0_GC_PERCENT" in line:
-				primerpairs[seqid].left.gc = float(line.split("=")[1])
-			elif "PRIMER_LEFT_0_SELF_ANY_TH" in line:
-				primerpairs[seqid].left.anys = float(line.split("=")[1])
-			elif "PRIMER_LEFT_0_SELF_END_TH" in line:
-				primerpairs[seqid].left.three = float(line.split("=")[1])
-			elif "PRIMER_LEFT_0_HAIRPIN_TH" in line:
-				primerpairs[seqid].left.hairpin = float(line.split("=")[1])
-			elif "PRIMER_LEFT_0_END_STABILITY" in line:
-				primerpairs[seqid].left.end_stability = float(line.split("=")[1])
-			elif "PRIMER_RIGHT_0_SEQUENCE" in line:
-				primerpairs[seqid].right.seq = line.split("=")[1]
-			elif "PRIMER_RIGHT_0=" in line:
-				primerpairs[seqid].right.start = int(line.split("=")[1].split(",")[0])
-				primerpairs[seqid].right.length = int(line.split("=")[1].split(",")[1])
-				primerpairs[seqid].right.end = primerpairs[seqid].right.start - primerpairs[seqid].right.length + 1
-			elif "PRIMER_RIGHT_0_TM" in line:
-				primerpairs[seqid].right.tm = float(line.split("=")[1])
-			elif "PRIMER_RIGHT_0_GC_PERCENT" in line:
-				primerpairs[seqid].right.gc = float(line.split("=")[1])
-			elif "PRIMER_RIGHT_0_SELF_ANY_TH" in line:
-				primerpairs[seqid].right.anys = float(line.split("=")[1])
-			elif "PRIMER_RIGHT_0_SELF_END_TH" in line:
-				primerpairs[seqid].right.three = float(line.split("=")[1])
-			elif "PRIMER_RIGHT_0_HAIRPIN_TH" in line:
-				primerpairs[seqid].right.hairpin = float(line.split("=")[1])
-			elif "PRIMER_RIGHT_0_END_STABILITY" in line:
-				primerpairs[seqid].right.end_stability = float(line.split("=")[1])
+		##########################
+		### parse primer 3 primer check output
+		primerpairs = parse_primer3output(primer3output, 1)
+		#primerpairs = {} # sequence ID is the key
 
-
+	#######################################
 	# write to file
 	outfile = open(out, 'w')
 	outfile.write("index\tproduct_size\ttype\tstart\tend\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\t3'differall\tpenalty\tcompl_any\tcompl_end\tPrimerID\tmatched_chromosomes\n")
