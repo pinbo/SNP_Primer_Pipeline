@@ -468,6 +468,13 @@ def caps(seqfile):
 	print "dcaps_list is ", [x.name for x in dcaps_list]
 	variation = [] # variation sites that can differ ALL
 	variation2 = [] # variation sites that can differ at least 2 homeologs
+	
+	# STEP 0: create alignment file and primer3output file
+	RawAlignFile = "alignment_raw_" + snpname + ".fa"
+	alignmentcmd = muscle_path + " -in " + seqfile2 + " -out " + RawAlignFile + " -quiet"
+	print "Alignment command: ", alignmentcmd
+	call(alignmentcmd, shell=True)
+	
 	#########################
 	if not len(ids): # if there is no homeologs found, such as when ploidy is 1
 		# loop to write primer3 input for each variation site
@@ -550,11 +557,7 @@ def caps(seqfile):
 		primerpairs = parse_primer3output(primer3output, 5)
 	else: # if there are homeolog sequences	
 	########################
-		# STEP 0: create alignment file and primer3output file
-		RawAlignFile = "alignment_raw_" + snpname + ".fa"
-		alignmentcmd = muscle_path + " -in " + seqfile2 + " -out " + RawAlignFile + " -quiet"
-		print "Alignment command: ", alignmentcmd
-		call(alignmentcmd, shell=True)
+		
 		########################
 		# read alignment file
 		fasta = get_fasta(RawAlignFile)
