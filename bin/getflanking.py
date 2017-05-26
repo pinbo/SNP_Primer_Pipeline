@@ -70,6 +70,7 @@ range_list = [] # range list for each subject
 # 1: query id, subject id, % identity, alignment length, mismatches, gap opens, 
 # 7: q. start, q. end, s. start, s. end, evalue, bit score
 # 13: q. sequence, s. sequence, s. length
+snp_list = [] # max alignment length for each snp
 for line in open(blast_file):
 	if line.startswith('#'):
 		continue
@@ -84,8 +85,11 @@ for line in open(blast_file):
 		continue
 	pct_identity = float(fields[2])
 	align_length = int(fields[3])
+	if snp not in snp_list:
+		snp_list.append(snp)
+		min_align = max(50, align_length * 0.9) # to filter out those not very good alignment, since I will blast anyway later.
 	# only get min-identity 90% and at least 50 bp alignment
-	if pct_identity > 90 and align_length > 50:
+	if pct_identity > 90 and align_length > min_align:
 		qstart, qstop, sstart, sstop = [int(x) for x in fields[6:10]]
 		qseq, sseq = fields[12:14]
 		slen = int(fields[14]) # subject length
