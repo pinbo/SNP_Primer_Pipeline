@@ -89,7 +89,7 @@ for line in open(blast_file):
 		qstart, qstop, sstart, sstop = [int(x) for x in fields[6:10]]
 		qseq, sseq = fields[12:14]
 		slen = int(fields[14]) # subject length
-		if snp_pos[snp] < qstart: # if snp is not in the alignment
+		if snp_pos[snp] < qstart or snp_pos[snp] > qstop: # if snp is not in the alignment
 			continue
 		# gap positions for qseq and sseq
 		# gap will mess up the SNP position, so need to count
