@@ -27,7 +27,7 @@
 
 # change the reference location accordingly.
 
-# example: run_getkasp.py for_polymarker.csv 3 200
+# example: run_getkasp.py for_polymarker.csv 3 200 1 1 1
 
 #########################
 from glob import glob
@@ -37,6 +37,9 @@ def main(args):
 	polymarker_input = args[1]
 	genome_number =  args[2]
 	price = args[3]
+	caps = int(args[4])
+	kasp = int(args[5])
+	blast = args[6]
 	script_path = os.path.dirname(os.path.realpath(__file__)) + "/bin/" # scripts folder
 	#reference = "/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_CSS_ABD-TGAC_v1.fa" # blast contig file
 	reference = "/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta"
@@ -67,9 +70,10 @@ def main(args):
 	call(cmd5, shell=True)
 	
 	# step 6: get kasp
-	cmd6 = script_path + "getkasp3.py 1" # add blast option
-	print "Step 6: Get KASP primers for each marker command:\n", cmd6
-	call(cmd6, shell=True)
+	if kasp:
+		cmd6 = script_path + "getkasp3.py " + blast # add blast option
+		print "Step 6: Get KASP primers for each marker command:\n", cmd6
+		call(cmd6, shell=True)
 	
 	# step 7: parse the for_polymarker input and create the input for SNP2CAPS
 	#cmd7 = script_path + "parse_polymarker_input_for_CAPS.py " + polymarker_input
@@ -82,9 +86,10 @@ def main(args):
 	#call(cmd8, shell=True)
 	
 	# step 9: get CAPS markers
-	cmd9 = script_path + "getCAPS.py 1 " + price # add blast option and price
-	print "Step 9: Get CAPS and dCAPS primers for each marker command:\n", cmd9
-	call(cmd9, shell=True)
+	if caps:
+		cmd9 = script_path + "getCAPS.py " + blast + " " + price # add blast option and price
+		print "Step 9: Get CAPS and dCAPS primers for each marker command:\n", cmd9
+		call(cmd9, shell=True)
 	
 	# step 10: concatenate output files
 	caps_files = glob("CAPS_output/selected_CAPS_primers*")
@@ -102,8 +107,10 @@ def main(args):
 	cmd11 = "cat KASP_output/selected_KASP_primers* > Potential_KASP_primers.tsv"
 	cmd12 = "cat alignment_raw_* > All_alignment_raw.fa"
 	print "Concatenate all output files to single files\n", cmd10, "\n", cmd11, "\n", cmd12
-	call(cmd10, shell=True)
-	call(cmd11, shell=True)
+	if caps:
+		call(cmd10, shell=True)
+	if kasp:
+		call(cmd11, shell=True)
 	#call(cmd12, shell=True)
 	
 	print "\n\n\n KASP primers have been designed successfully!\n Check files beginning with 'select_primer' and CAPS_output.txt"
