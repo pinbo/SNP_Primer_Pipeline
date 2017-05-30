@@ -35,11 +35,60 @@ from glob import glob
 #########################
 
 blast = int(sys.argv[1]) # 0 or 1, whether to blast
+max_price = int(sys.argv[2])
 # get all the raw sequences
 raw = glob("flanking_temp_marker*") # All file names start from "flanking"
 raw.sort()
 
 iupac = {"R": "AG", "Y": "TC", "S": "GC", "W": "AT", "K": "TG", "M": "AC"}
+
+
+
+# classes
+class Restriction_Enzyme(object):
+	def __init__(self, name, seq):
+		self.name = name
+		self.seq = seq.lower()
+		self.length = len(seq)
+		self.template_seq = ""
+		self.primer_end_pos = None
+		self.caps = "No"
+		self.dcaps = "No"
+		self.allpos = [] # all the match positions in the template
+		self.change_pos = None
+		self.price = int(name.split(',')[-1])
+
+class Primers(object):
+	"""A primer set designed by Primer3"""
+	def __init__(self):
+		self.name = ""
+		self.start = 0
+		self.end = 0
+		self.length = 0
+		self.tm = 0.0
+		self.gc = 0.0
+		self.anys = 0.0
+		self.three = 0.0
+		self.hairpin = 0.0
+		self.end_stability = 0.0
+		self.seq = ""
+		self.difthreeall = "NO" # whether 3' site can differ all
+	def formatprimer(self):
+		formatout = "\t".join(str(x) for x in [self.start, self.end, self.length, self.tm, self.gc, self.anys, self.three, self.end_stability, self.hairpin, self.seq, ReverseComplement(self.seq), self.difthreeall])
+		return(formatout)
+
+class PrimerPair(object):
+	"""A pair of primers designed by Primer3"""
+	def __init__(self):
+		self.left = Primers()
+		self.right = Primers()
+		self.compl_any = "NA"
+		self.compl_end = "NA"
+		self.penalty = "NA"
+		self.product_size = 0
+
+
+
 
 #from sys import platform
 def get_software_path(base_path):
@@ -54,12 +103,7 @@ def get_software_path(base_path):
 		muscle_path = base_path + "/muscle3.8.31_i86darwin64"
 	return primer3_path, muscle_path
 
-# function to get reverse complement
-def ReverseComplement(seq):
-	# too lazy to construct the dictionary manually, use a dict comprehension
-	seq1 = 'ATCGTAGCatcgtagc'
-	seq_dict = { seq1[i]:seq1[i+4] for i in range(16) if i < 4 or 8<=i<12 }
-	return "".join([seq_dict[base] for base in reversed(seq)])
+
 
 # simple Tm calculator
 def Tm(seq):
@@ -126,51 +170,6 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		#print k, "\t", seqk
 	return seq2comp
 
-# step 1: read the enzyme file
-RE_file = "/home/junli/Documents/Git/getcaps_pipeline/striderc.403.parsed"
-# function to parse the enzyme file and return a dictionary with enzyme name and sequences
-class Restriction_Enzyme(object):
-	def __init__(self, name, seq):
-		self.name = name
-		self.seq = seq.lower()
-		self.length = len(seq)
-		self.template_seq = ""
-		self.primer_end_pos = None
-		self.caps = "No"
-		self.dcaps = "No"
-		self.allpos = [] # all the match positions in the template
-		self.change_pos = None
-
-# classes
-class Primers(object):
-	"""A primer set designed by Primer3"""
-	def __init__(self):
-		self.name = ""
-		self.start = 0
-		self.end = 0
-		self.length = 0
-		self.tm = 0.0
-		self.gc = 0.0
-		self.anys = 0.0
-		self.three = 0.0
-		self.hairpin = 0.0
-		self.end_stability = 0.0
-		self.seq = ""
-		self.difthreeall = "NO" # whether 3' site can differ all
-	def formatprimer(self):
-		formatout = "\t".join(str(x) for x in [self.start, self.end, self.length, self.tm, self.gc, self.anys, self.three, self.end_stability, self.hairpin, self.seq, ReverseComplement(self.seq), self.difthreeall])
-		return(formatout)
-
-class PrimerPair(object):
-	"""A pair of primers designed by Primer3"""
-	def __init__(self):
-		self.left = Primers()
-		self.right = Primers()
-		self.compl_any = "NA"
-		self.compl_end = "NA"
-		self.penalty = "NA"
-		self.product_size = 0
-
 def parse_RE_file(RE_file):
 	REs = {}
 	with open(RE_file) as file_one:
@@ -179,42 +178,49 @@ def parse_RE_file(RE_file):
 			REs[enzyme] = Restriction_Enzyme(enzyme, seq)
 	return REs
 
-# step 2: function to test whether a SNP can be converted to an enzyme cutting site
+
+def ReverseComplement(seq):
+	s1 = "BDHKMNRSVWYATGCbdhkmnrsvwyatgc"
+	s2 = "VHDMKNYSBWRTACGvhdmknysbwrtacg"
+	seq_dict = {s1[i]:s2[i] for i in range(len(s1))}
+	return "".join([seq_dict[base] for base in reversed(seq)])
+
+
 def string_dif(s1, s2): # two strings with equal length
 	return [i for i in xrange(len(s1)) if s1[i] != s2[i]]
 
-def find_substring(substring, string): # find all the starting index of a substring
-	return [m.start() for m in re.finditer(substring, string)]
+def seq2pattern(seq):
+	iupac = {
+		"B": "[CGT]",
+		"D": "[AGT]",
+		"H": "[ACT]",
+		"K": "[GT]",
+		"M": "[AC]",
+		"N": "[ACGT]",
+		"R": "[AG]",
+		"S": "[CG]",
+		"V": "[ACG]",
+		"W": "[AT]",
+		"Y": "[CT]"
+	}
+	seq = seq.upper()
+	seq2 = ""
+	for i in seq:
+		if i in "ATGC":
+			seq2 += i
+		else:
+			seq2 += iupac[i]
+	return seq2.lower()
 
-def test_enzyme(enzyme, wild_seq, mut_seq): # enzyme is an Restriction_Enzyme object
-	enzyme_seq = enzyme.seq
-	enzyme_name = enzyme.name
-	wild_seq = wild_seq.lower()
-	mut_seq = mut_seq.lower()
-	wild_allpos = find_substring(enzyme_seq, wild_seq)
-	mut_allpos = find_substring(enzyme_seq, mut_seq)
-	#print "enzyme is: ", enzyme_name
-	#print "wild_allpos: ", wild_allpos
-	#print " mut_allpos: ", mut_allpos
-	enzyme.allpos = wild_allpos
-	if len(wild_allpos) != len(mut_allpos): # snp cause digestion differenc
-		enzyme.caps = "Yes"
-		enzyme.template_seq = wild_seq
-		#return enzyme
-	# else no caps found, check dcaps
+def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match wild_seq after 1 base change but not mut_seq
 	snp_pos = string_dif(wild_seq, mut_seq)[0] # snp position in the template
-	#print "wild flanking:   ", wild_seq[snp_pos -6:snp_pos + 7]
-	#print "mutant flanking: ", mut_seq[snp_pos -6:snp_pos + 7]
-	snp_A = wild_seq[snp_pos]
-	snp_B = mut_seq[snp_pos]
-	#print "snp_pos is", snp_pos
+	enzyme_name = enzyme.name
+	enzyme_seq = enzyme.seq
 	for i in range(len(enzyme_seq)):
-		ss = enzyme_seq[0:i] + "[atgc]" + enzyme_seq[i+1:] # regular expression
-		# try wild_seq first
+		ss = seq2pattern(enzyme_seq[0:i]) + "[atgc]" + seq2pattern(enzyme_seq[i+1:]) # regular expression
+		#print "Enzyme, Enzyme seq, pattern ", enzyme_name, enzyme_seq, ss
 		for m in re.finditer(ss, wild_seq):
-			#print m.start(), m.end(), m.span(), m.group()
-			if snp_pos in range(m.start(), m.end()):
-				print "Find RE across the SNP and it is ", enzyme.name, m.group()
+			if snp_pos in range(m.start(), m.end()) and not re.search(ss, mut_seq[m.start():m.end()]):
 				change_pos = m.start() + i # which was changed
 				if abs(snp_pos - change_pos) > 1: # to insure the introduced mutaton is at least 2 bases far from the snp
 					print "One nt can be changed to fit enzyme", enzyme.name
@@ -226,30 +232,46 @@ def test_enzyme(enzyme, wild_seq, mut_seq): # enzyme is an Restriction_Enzyme ob
 					else:
 						enzyme.primer_end_pos = range(snp_pos + 1, change_pos) # a list of primer end positions
 					print "change position and primer end postions are ", change_pos, enzyme.primer_end_pos
-					print "wild_allpos ", wild_allpos
 					break
 		# break the loop if dcaps found
 		if enzyme.dcaps == "Yes":
 			break
-		for m in re.finditer(ss, mut_seq):
-			#print m.start(), m.end(), m.span(), m.group()
-			if snp_pos in range(m.start(), m.end()):
-				print "Find RE across the SNP and it is ", enzyme.name, m.group()
-				change_pos = m.start() + i # which was changed
-				if abs(snp_pos - change_pos) > 1: # to insure the introduced mutaton is at least 2 bases far from the snp
-					print "One nt can be changed to fit enzyme", enzyme.name
-					enzyme.dcaps = "Yes"
-					enzyme.template_seq = mut_seq[:change_pos] + enzyme_seq[i].upper() + mut_seq[change_pos+1:]
-					enzyme.change_pos = change_pos
-					if change_pos < snp_pos:
-						enzyme.primer_end_pos = range(change_pos + 1, snp_pos) # a list of primer end positions
-					else:
-						enzyme.primer_end_pos = range(snp_pos + 1, change_pos) # a list of primer end positions
-					print "change position and primer end postions are ", change_pos, enzyme.primer_end_pos
-					print "wild_allpos ", wild_allpos
-					break
 	return enzyme
-			
+
+def find_substring(substring, string): # find all the starting index of a substring
+	return [m.start() for m in re.finditer(substring, string)]
+
+def test_enzyme(enzyme, wild_seq, mut_seq): # enzyme is an Restriction_Enzyme object
+	enzyme_seq = enzyme.seq
+	enzyme_seq_RC = ReverseComplement(enzyme_seq) # 1
+	enzyme_name = enzyme.name
+	wild_seq = wild_seq.lower()
+	mut_seq = mut_seq.lower()
+	wild_allpos = find_substring(seq2pattern(enzyme_seq), wild_seq)
+	mut_allpos = find_substring(seq2pattern(enzyme_seq), mut_seq)
+	wild_allpos += find_substring(seq2pattern(enzyme_seq_RC), wild_seq) # also check reverse complement sequences of enzyme
+	mut_allpos += find_substring(seq2pattern(enzyme_seq_RC), mut_seq)
+	enzyme.allpos = list(set(wild_allpos))
+	if len(wild_allpos) != len(mut_allpos): # snp cause digestion difference
+		enzyme.caps = "Yes"
+		enzyme.template_seq = wild_seq
+		print "CAPS found with enzyme ", enzyme_name
+		return enzyme
+	# else no caps found, check dcaps
+	#snp_pos = string_dif(wild_seq, mut_seq)[0] # snp position in the template
+	#print "snp_pos is", snp_pos
+	enzyme = check_pattern(enzyme, wild_seq, mut_seq)
+	if enzyme.dcaps != "Yes":
+		enzyme = check_pattern(enzyme, mut_seq, wild_seq)
+	if enzyme.dcaps != "Yes" and enzyme_seq_RC != enzyme_seq:
+		enzyme.seq = enzyme_seq_RC
+		enzyme = check_pattern(enzyme, wild_seq, mut_seq)
+	if enzyme.dcaps != "Yes" and enzyme_seq_RC != enzyme_seq:
+		enzyme = check_pattern(enzyme, mut_seq, wild_seq)
+	return enzyme
+
+
+
 # function to count mismtaches
 def mismatchn (s1, s2):
 	return sum(c1!=c2 for c1,c2 in zip(s1,s2))
@@ -449,7 +471,7 @@ def caps(seqfile):
 	seq_template = fasta_raw[target]
 	################## Get CAPS information
 	# step 1: read the enzyme file
-	RE_file = getcaps_path + "/striderc.403.parsed_JZ.txt" # this one removed some duplicated cuttings
+	RE_file = getcaps_path + "/NEB_parsed_REs.txt" # this one removed some duplicated cuttings
 	REs = parse_RE_file(RE_file) # get the list of restriction enzymes
 	# step 2: get the list of enzymes that can be used for caps or dcaps
 	SNP_A, SNP_B = iupac[allele] # SNP 2 alleles
@@ -459,12 +481,15 @@ def caps(seqfile):
 	caps_list = []
 	dcaps_list = []
 	for k in REs:
-		enzyme = test_enzyme(REs[k], wild_seq, mut_seq)
+		enzyme = REs[k]
+		if enzyme.price > max_price:
+			continue
+		enzyme = test_enzyme(enzyme, wild_seq, mut_seq)
 		if enzyme.caps == "Yes":
 			caps_list.append(enzyme)
 		elif enzyme.dcaps == "Yes":
 			dcaps_list.append(enzyme)
-	print "caps_list is ", caps_list
+	print "caps_list is ", [x.name for x in caps_list]
 	print "dcaps_list is ", [x.name for x in dcaps_list]
 	variation = [] # variation sites that can differ ALL
 	variation2 = [] # variation sites that can differ at least 2 homeologs

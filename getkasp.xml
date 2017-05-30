@@ -1,9 +1,10 @@
 <tool id="snpmarker" name="SNP Primer Design">
   <description>for each sequence in a CSV file</description>
-  <command interpreter="python">run_getkasp.py $input $ploidy</command>
+  <command interpreter="python">run_getkasp.py $input $ploidy $price</command>
   <inputs>
     <param format="txt" name="input" type="data" label="CSV file"/>
     <param name="ploidy" size="4" type="integer" value="3" label="Ploidy"/>
+    <param name="price" size="4" type="integer" value="200" label="Maximum NEB restriction enzyme price"/>
   </inputs>
   <outputs>
       <data format="tabular" name="caps_out" from_work_dir="Potential_CAPS_primers.tsv" label="${tool.name} CAPS primer output"/>
