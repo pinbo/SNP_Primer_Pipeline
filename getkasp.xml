@@ -3,8 +3,8 @@
   <command interpreter="python">run_getkasp.py $input $ploidy $price $CAPS $KASP $blast</command>
   <inputs>
     <param format="txt" name="input" type="data" label="CSV file"/>
-    <param name="ploidy" size="4" type="integer" value="3" label="Ploidy"/>
-    <param name="price" size="4" type="integer" value="200" label="Maximum NEB restriction enzyme price"/>
+    <param name="ploidy" size="4" type="integer" value="3" label="Ploidy" help="A genome, AB genome, or ABD genome"/>
+    <param name="price" size="4" type="integer" value="200" label="Maximum NEB restriction enzyme price (dollars per 1000 U)"/>
     <param name="CAPS" type="select" label="Design CAPS/dCAPS primers?" help="If yes, CAPS/dCAPS primers will be designed.">
         <option value="1">Yes</option>
         <option value="0">No</option>
@@ -34,12 +34,15 @@ The input file is the same as polymarker, e.g. a csv file with each line looks l
 
 IWA7892,1BL,AGGATTCACGGGAAAAGATTTCGTCGCA[C/T]GTGCTAGGGTCTTTGCAGAATGTTA
 
+------
 
 **Restriction Enzymes**
 
 Restriction Enzymes used in this tool are all from NEB. And the prices were obtained on 05/29/2017.
 
 I processed these enzymes and enzymes with the same recognization sequences were merged together. For example, MspI and HpaII both recognize "ccgg", so I give them the name "MspI,HpaII,13"; the number in the end is the lowest price (US dolloars per 1000 U) of the enzyme group.
+
+------
 
 **Output Format**
 
@@ -54,6 +57,10 @@ Three output files will be availabe after each run:
 For the KASP and CAPS output, below the primer pairs for each marker are the positions that can differ all the other homeologs. These positions are used for 3' start of primers in Primer3. When selecting primers, if it has more than 1 of these positions in the first 4 bases from the 3', then it would be more unique to this chromosome.
 
 Results of **primer blast** against the IWGSC pseudomolecule v1.0 was in the last column of the KASP and CAPS output file. The selection criterion is: less than 2 mismatches in the first 4 bases from the 3' of each primer.
+
+------
+
+For more information, please check: https://github.com/pinbo/getKASP_pipeline
 
   </help>
 
