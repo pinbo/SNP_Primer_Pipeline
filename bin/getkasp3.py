@@ -533,7 +533,7 @@ def kasp(seqfile):
 			if right_end - left_end > product_max - 35: # suppose both primers are 18 bp
 				continue
 			settings = "PRIMER_TASK=generic" + "\n" + \
-			"SEQUENCE_ID=" + snpname + "-" + str(i) + "\n" + \
+			"SEQUENCE_ID=" + snpname + "-" + str(i+1) + "\n" + \
 			"SEQUENCE_TEMPLATE=" + seq_template + "\n" + \
 			"PRIMER_PRODUCT_SIZE_RANGE=50-250" + "\n" + \
 			"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getkasp_path + "/primer3_config/"  + "\n" + \

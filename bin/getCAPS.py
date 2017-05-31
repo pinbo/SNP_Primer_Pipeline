@@ -521,7 +521,7 @@ def caps(seqfile):
 				if right_end - left_end < product_min - 35 or right_end - left_end > product_max - 35: # suppose both primers are 18 bp
 					continue
 				settings = "PRIMER_TASK=generic" + "\n" + \
-				"SEQUENCE_ID=" + snpname + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(primer_end_pos) + "\n" + \
+				"SEQUENCE_ID=" + snpname + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(primer_end_pos+1) + "\n" + \
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 				"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
@@ -689,7 +689,7 @@ def caps(seqfile):
 					if right_end - left_end < product_min - 35 or right_end - left_end > product_max - 35: # suppose both primers are 18 bp
 						continue
 					settings = "PRIMER_TASK=generic" + "\n" + \
-					"SEQUENCE_ID=" + snpname + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i) + "-" + str(primer_end_pos) + "\n" + \
+					"SEQUENCE_ID=" + snpname + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i+1) + "-" + str(primer_end_pos+1) + "\n" + \
 					"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 					"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 					"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
@@ -716,7 +716,7 @@ def caps(seqfile):
 					left_end = -1000000
 					right_end = i + 1
 				settings = "PRIMER_TASK=generic" + "\n" + \
-				"SEQUENCE_ID=" + snpname + "-CAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i) + "\n" + \
+				"SEQUENCE_ID=" + snpname + "-CAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i+1) + "\n" + \
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 				"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
