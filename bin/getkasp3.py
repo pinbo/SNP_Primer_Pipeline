@@ -633,13 +633,16 @@ def kasp(seqfile):
 		pl.direction = "LEFT"
 		pr.direction = "RIGHT"
 		if pl.end == snp_site + 1:
-			#print "pl.seq ", pl.seq 
+			#print "pl.seq, SNP_A, SNP_B, ReverseComplement(SNP_A), ReverseComplement(SNP_B)"
+			#print pl.seq, SNP_A, SNP_B, ReverseComplement(SNP_A), ReverseComplement(SNP_B)
 			pA = copy.deepcopy(pl)
 			pB = copy.deepcopy(pl)
 			pA.seq = pA.seq[:-1] + SNP_A
 			pB.seq = pB.seq[:-1] + SNP_B
 			pC = pr
 		else:
+			#print "pr.seq, SNP_A, SNP_B, ReverseComplement(SNP_A), ReverseComplement(SNP_B)"
+			#print pr.seq, SNP_A, SNP_B, ReverseComplement(SNP_A), ReverseComplement(SNP_B)
 			pA = copy.deepcopy(pr)
 			pB = copy.deepcopy(pr)
 			pA.seq = pA.seq[:-1] + ReverseComplement(SNP_A)
