@@ -44,6 +44,8 @@ genomes = genomes[:genome_number] # final genomes
 snp_pos = {}
 for line in open(polymarker_input):
 	snp, chrom, seq = line.strip().split(",")
+	snp = snp.replace("_", "-") # in case there is already "_" in the snp name
+	seq = seq.strip() # in case there are spaces in the input file
 	snp_pos[snp] = seq.find("[") + 1
 
 # function to find all the indexes (1-based) of a character

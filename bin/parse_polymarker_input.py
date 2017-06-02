@@ -40,6 +40,7 @@ def main():
 	for line in open(polymarker_input):
 		snpname, chrom, seq = line.strip().split(",")
 		snpname = snpname.replace("_", "-") # in case there is already "_" in the snp name
+		seq = seq.strip() # in case there is space in the input file
 		pos = seq.find("[")
 		snp = iupac[seq[pos:pos+5]]
 		seq2 = seq[:pos] + snp + seq[pos+5:]

@@ -56,9 +56,9 @@ def get_software_path(base_path):
 
 # function to get reverse complement
 def ReverseComplement(seq):
-	# too lazy to construct the dictionary manually, use a dict comprehension
-	seq1 = 'ATCGTAGCatcgtagc'
-	seq_dict = { seq1[i]:seq1[i+4] for i in range(16) if i < 4 or 8<=i<12 }
+	s1 = "BDHKMNRSVWYATGCbdhkmnrsvwyatgc"
+	s2 = "VHDMKNYSBWRTACGvhdmknysbwrtacg"
+	seq_dict = {s1[i]:s2[i] for i in range(len(s1))}
 	return "".join([seq_dict[base] for base in reversed(seq)])
 
 # classes
