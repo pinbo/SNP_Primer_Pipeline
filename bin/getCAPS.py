@@ -375,7 +375,7 @@ def parse_primer3output(primer3output, primerpair_to_return):
 				primerpairs[seqid + "-" + mm.group(1)].product_size = int(line.split("=")[1])
 				continue
 			elif re.search( "PRIMER_LEFT_" + regex + "_SEQUENCE", line):
-				re.search( "PRIMER_LEFT_" + regex + "_SEQUENCE", line)
+				mm = re.search( "PRIMER_LEFT_" + regex + "_SEQUENCE", line)
 				primerpairs[seqid + "-" + mm.group(1)].left.seq = line.split("=")[1]
 				continue
 			elif re.search( "PRIMER_LEFT_" + regex + "=", line):

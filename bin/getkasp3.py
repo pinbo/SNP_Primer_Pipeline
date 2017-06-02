@@ -32,6 +32,7 @@
 from subprocess import call
 import getopt, sys, os, re
 from glob import glob
+import copy
 #########################
 
 blast = int(sys.argv[1]) # 0 or 1, whether to blast
@@ -77,8 +78,10 @@ class Primers(object):
 		self.end_stability = 0.0
 		self.seq = ""
 		self.difthreeall = "NO" # whether 3' site can differ all
+		self.difnum = 0
+		self.direction = ""
 	def formatprimer(self):
-		formatout = "\t".join(str(x) for x in [self.start, self.end, self.length, self.tm, self.gc, self.anys, self.three, self.end_stability, self.hairpin, self.seq, ReverseComplement(self.seq), self.difthreeall])
+		formatout = "\t".join(str(x) for x in [self.direction, self.start, self.end, self.difnum, self.difthreeall, self.length, self.tm, self.gc, self.anys, self.three, self.end_stability, self.hairpin, self.seq, ReverseComplement(self.seq)])
 		return(formatout)
 
 class PrimerPair(object):
@@ -259,7 +262,7 @@ def parse_primer3output(primer3output, primerpair_to_return):
 				primerpairs[seqid + "-" + mm.group(1)].product_size = int(line.split("=")[1])
 				continue
 			elif re.search( "PRIMER_LEFT_" + regex + "_SEQUENCE", line):
-				re.search( "PRIMER_LEFT_" + regex + "_SEQUENCE", line)
+				mm = re.search( "PRIMER_LEFT_" + regex + "_SEQUENCE", line)
 				primerpairs[seqid + "-" + mm.group(1)].left.seq = line.split("=")[1]
 				continue
 			elif re.search( "PRIMER_LEFT_" + regex + "=", line):
@@ -325,6 +328,18 @@ def parse_primer3output(primer3output, primerpair_to_return):
 				continue
 	return primerpairs
 
+# function to find primer sequence variation site and highligh them in primer sequences
+def format_primer_seq(primer, variation): # input is a primer object and variation list
+	primer_range = range(primer.start - 1, primer.end)
+	var_sites = set(variation).intersection(primer_range)
+	var_sites_relative = [i - primer.start + 1 for i in var_sites]
+	seq = primer.seq.lower()
+	for i in var_sites_relative:
+		seq = seq[:i] + seq[i].upper() + seq[i+1:]
+	primer.seq = seq
+	primer.difnum = len(var_sites)
+	return primer
+
 
 def kasp(seqfile):
 	#flanking_temp_marker_IWB1855_7A_R_251.fa
@@ -340,7 +355,8 @@ def kasp(seqfile):
 	product_min = 50
 	product_max = 250
 	alt_allele = iupac[allele][0] # choose A or T
-	
+	SNP_A, SNP_B = iupac[allele] # SNP 2 alleles
+	print "SNP_A, SNP_B ", SNP_A, SNP_B
 	# software path
 	primer3_path, muscle_path = get_software_path(getkasp_path)
 	
@@ -524,7 +540,9 @@ def kasp(seqfile):
 			seq_template = seq_template[:snp_site] +  alt_allele + seq_template[snp_site + 1:]
 
 		for i in variation2:
-			if i < snp_site:
+			if i == snp_site:
+				continue
+			elif i < snp_site:
 				left_end = i
 				right_end = snp_site
 			else:
@@ -556,6 +574,7 @@ def kasp(seqfile):
 		print "Primer3 command 1st time: ", p3cmd
 		call(p3cmd, shell=True)
 		primerpairs = parse_primer3output(primer3output, 1)
+		print "primerpairs length ", len(primerpairs)
 		####################################
 		# Get primer list for blast
 		primer_for_blast = {}
@@ -563,7 +582,8 @@ def kasp(seqfile):
 		nL = 0 # left primer count
 		nR = 0 # right primer count
 		for i, pp in primerpairs.items():
-			varsite = int(i.split("-")[-1]) # variation site
+			varsite = int(i.split("-")[-2]) - 1 # variation site
+			#print "varsite", varsite
 			if pp.product_size != 0:
 				pl = pp.left
 				pr = pp.right
@@ -580,6 +600,7 @@ def kasp(seqfile):
 					rr = range(pc.end -1, min(pc.end + 9, len(seq_template) - 20)) # rr should be within the keys of diffarray, which is from gap_left to gap_right
 				# sum of all the variation in each site
 				aa = [sum(x) for x in zip(*(diffarray[k] for k in rr))]
+				print "aa ", aa
 				if min(aa) > 0: # if common primer can differ all
 					if pl.seq not in primer_for_blast:
 						nL += 1
@@ -599,7 +620,7 @@ def kasp(seqfile):
 	#################################################	
 	# write to file
 	outfile = open(out, 'w')
-	outfile.write("index\tproduct_size\ttype\tstart\tend\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\t3'differall\tpenalty\tcompl_any\tcompl_end\tPrimerID\tmatched_chromosomes\n")			
+	outfile.write("index\tproduct_size\ttype\tstart\tend\tvariation number\t3'diffall\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\tpenalty\tcompl_any\tcompl_end\tPrimerID\tmatched_chromosomes\n")			
 	# blast primers
 	blast_hit = {}
 	outfile_blast = directory + "/primer_blast_out_" + snpname + ".txt"
@@ -607,11 +628,27 @@ def kasp(seqfile):
 		blast_hit = primer_blast(primer_for_blast, outfile_blast) # chromosome hit for each primer
 	# write output file
 	for i, pp in final_primers.items():
-		pl = pp.left
-		pr = pp.right
-		outfile.write("\t".join([i, str(pp.product_size), "LEFT", pl.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pl.name, blast_hit.setdefault(pl.name, "")]) + "\n")
-		outfile.write("\t".join([i, str(pp.product_size), "RIGHT", pr.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pr.name, blast_hit.setdefault(pr.name, "")]) + "\n")
-	
+		pl = format_primer_seq(pp.left, variation)
+		pr = format_primer_seq(pp.right, variation)
+		pl.direction = "LEFT"
+		pr.direction = "RIGHT"
+		if pl.end == snp_site + 1:
+			#print "pl.seq ", pl.seq 
+			pA = copy.deepcopy(pl)
+			pB = copy.deepcopy(pl)
+			pA.seq = pA.seq[:-1] + SNP_A
+			pB.seq = pB.seq[:-1] + SNP_B
+			pC = pr
+		else:
+			pA = copy.deepcopy(pr)
+			pB = copy.deepcopy(pr)
+			pA.seq = pA.seq[:-1] + SNP_A
+			pB.seq = pB.seq[:-1] + SNP_B
+			pC = pl
+		outfile.write("\t".join([i + "-" + SNP_A, str(pp.product_size), pA.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pA.name, blast_hit.setdefault(pA.name, "")]) + "\n")
+		outfile.write("\t".join([i + "-" + SNP_B, str(pp.product_size), pB.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pB.name, blast_hit.setdefault(pB.name, "")]) + "\n")
+		outfile.write("\t".join([i + "-Common", str(pp.product_size),   pC.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pC.name, blast_hit.setdefault(pC.name, "")]) + "\n")
+
 	outfile.write("\n\nSites that can differ all for " + snpname + "\n")
 	outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
 	outfile.write("\n\n\n")
