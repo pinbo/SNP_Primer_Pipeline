@@ -796,13 +796,13 @@ def caps(seqfile):
 		blast_hit = primer_blast(primer_for_blast, outfile_blast) # chromosome hit for each primer
 	# write output file
 	for i, pp in final_primers.items():
-		varsite = int(i.split("-")[-1]) # variation site
+		#varsite = int(i.split("-")[-1]) # variation site
 		pl = pp.left
 		pr = pp.right
 		# check whether 3' can differ all: not necessary for here, because I only used sites that can differ all.
-		if varsite in variation:
-			pl.difthreeall = "YES"
-			pr.difthreeall = "YES"
+		#if varsite in variation:
+		pl.difthreeall = "YES"
+		pr.difthreeall = "YES"
 		outfile.write("\t".join([i, str(pp.product_size), "LEFT", pl.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pl.name, blast_hit.setdefault(pl.name, "")]) + "\n")
 		outfile.write("\t".join([i, str(pp.product_size), "RIGHT", pr.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pr.name, blast_hit.setdefault(pr.name, "")]) + "\n")
 	
