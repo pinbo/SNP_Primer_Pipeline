@@ -642,8 +642,8 @@ def kasp(seqfile):
 		else:
 			pA = copy.deepcopy(pr)
 			pB = copy.deepcopy(pr)
-			pA.seq = pA.seq[:-1] + SNP_A
-			pB.seq = pB.seq[:-1] + SNP_B
+			pA.seq = pA.seq[:-1] + ReverseComplement(SNP_A)
+			pB.seq = pB.seq[:-1] + ReverseComplement(SNP_B)
 			pC = pl
 		outfile.write("\t".join([i + "-" + SNP_A, str(pp.product_size), pA.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pA.name, blast_hit.setdefault(pA.name, "")]) + "\n")
 		outfile.write("\t".join([i + "-" + SNP_B, str(pp.product_size), pB.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pB.name, blast_hit.setdefault(pB.name, "")]) + "\n")
