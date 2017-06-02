@@ -43,7 +43,7 @@ genomes = genomes[:genome_number] # final genomes
 # get snp position
 snp_pos = {}
 for line in open(polymarker_input):
-	snp, chrom, seq = line.strip().split(",")
+	snp, chrom, seq = line.strip().replace(" ","").split(",") # in case there are spaces
 	snp = snp.replace("_", "-") # in case there is already "_" in the snp name
 	seq = seq.strip() # in case there are spaces in the input file
 	snp_pos[snp] = seq.find("[") + 1
