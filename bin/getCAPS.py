@@ -518,8 +518,8 @@ def caps(seqfile):
 				else:
 					left_end = primer_end_pos + 1
 					right_end = -1000000
-				if right_end - left_end < product_min - 35 or right_end - left_end > product_max - 35: # suppose both primers are 18 bp
-					continue
+				#if right_end - left_end < product_min - 35 or right_end - left_end > product_max - 35: # suppose both primers are 18 bp
+				#	continue
 				settings = "PRIMER_TASK=generic" + "\n" + \
 				"SEQUENCE_ID=" + snpname + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(primer_end_pos+1) + "\n" + \
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
