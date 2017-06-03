@@ -44,10 +44,10 @@ class SNP:
 		if contig.startswith("IWGSC_CSS"):
 			contig_info = contig.split("_") # IWGSC_CSS_7AL_scaff_4491815
 			self.chr = contig_info[2] # IWGSC_CSS_7AL_scaff_4491815
-			self.name = contig_info[1] + contig_info[2] + contig_info[4]
+			self.name = contig_info[1] + contig_info[2] + contig_info[4] + "-" + str(ref_pos)
 		elif contig.startswith("chr"): # pseudomolecule
 			self.chr = contig[-2:] # last two characters
-			self.name = contig + ref_pos
+			self.name = contig + "-" + str(ref_pos)
 		else:
 			self.chr = contig # last two characters
 			self.name = contig + ref_pos
