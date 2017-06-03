@@ -61,16 +61,17 @@ def main(args):
 	reference_list = ["/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_v2_ChrU.fa", 
 	"/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta"]
 	infile = args[1]
-	reference = reference_list(int(args[2]))
+	outfile = args[2]
+	reference = reference_list[int(args[3]) - 1] # reference 1 or 2
 	# step 1: get the flanking sequences
-	flanking_file = "flanking_seq.fa"
+	flanking_file = "temp_flanking_seq.fa"
 	cmd = "blastdbcmd -entry_batch " + infile + " -db " + reference + " > " + flanking_file
 	call(cmd, shell=True)
 	# step 2: replace the fasta sequence names with more information
 	seq_name_list = get_seq_name(infile)
 	seq_fasta = get_fasta(flanking_file, seq_name_list)
 	# step 3: write the organized fasta
-	out = open("organized_flanking_seq.fa", "w")
+	out = open(outfile, "w")
 	for i in seq_name_list:
 		out.write(">" + i + "\n")
 		out.write(seq_fasta[i] + "\n")

@@ -114,7 +114,7 @@ def main(argv):
 	outfile = argv[2] # output file
 	reference_list = ["/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_v2_ChrU.fa", 
 	"/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta"]
-	reference = reference_list(int(args[3])) # 0 or 1 for reference
+	reference = reference_list[int(argv[3]) - 1] # 1 or 2 for reference
 	snpdict = parse_exon_snp(snpinfo)
 	print "length of snpdict ", len(snpdict)
 	range_file = "temp_range.txt"
