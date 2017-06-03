@@ -1,0 +1,40 @@
+<tool id="ExtractSequences" name="Extract Sequences from References">
+  <description>extract sequence ranges in a contig or chromosome</description>
+  <command interpreter="python">bin/extract_seq_from_reference.py $input flanking_seq.fa $reference</command>
+  <inputs>
+    <param format="txt" name="input" type="data" label="Tab-delimited file"/>
+    <param name="reference" type="select" label="Which reference to use?" help="If your contig from IWGSC contigs (such as IWGSC_CSS_7AL_scaff_4491815), then choose the first 1; if it is from CS pseudomolecule v1.0, then choose the 2nd">
+        <option value="1">IWGSC_v2_ChrU</option>
+        <option value="2">Chinese_Spring_v1.0_pseudomolecules</option>
+    </param>
+  </inputs>
+  <outputs>
+      <data format="fasta" name="output" from_work_dir="flanking_seq.fa" label="${tool.name} sequences"/>
+  </outputs>
+
+  <help>
+
+**OVERVIEW**
+
+This tool extract sequences ranges from a chromosome or contig. The input file is a **tab-delimitted** range file and each line looks like this (contig name, sequence range and strand(plus or minus) )
+
+IWGSC_CSS_7AL_scaff_4491815    4033-4133    plus
+
+IWGSC_CSS_7AL_scaff_4552312    3190-3290    plus
+
+output file is a fasta file file (50 bp flanking sequences on each side) and looks like this:
+
+>IWGSC_CSS_7AL_scaff_4491815 4033-4133
+
+AGGTCTCACAGATTTACATACTAGGGGCTCGAGGCCCAACATAGCTCGATTACATCATATCGAGTGGCATCGAGGAGGGGTTTGGCAACTCTGGTGGCCGT
+
+>IWGSC_CSS_7AL_scaff_4552312 3190-3290
+
+CATATAGGACAAGATCCGAGAGCTCGTTTGCCATGATTAACCAGCCATGGGAGGCACCGCAGCAGGCCACAGCTTGGCCCCTGGGAAAGCTGACCTGAAAA
+------
+
+For more information, please check: https://github.com/pinbo/getKASP_pipeline
+
+  </help>
+
+</tool>
