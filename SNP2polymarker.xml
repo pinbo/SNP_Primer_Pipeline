@@ -16,7 +16,7 @@
 
 **OVERVIEW**
 
-This tool prepare polymarker input file from a SNP position in a contig or chromosome. The input file is a **tab-delimitted** file and each line looks like this (contig name, reference allele and altanative allele)
+This tool prepare polymarker input file from a SNP position in a contig or chromosome. The input file is a **tab or space delimited** file and each line looks like this (Contig or Chromosome name, SNP position, Reference allele, and Alternative allele)
 
 IWGSC_CSS_7AL_scaff_4491815	4083	T	A
 

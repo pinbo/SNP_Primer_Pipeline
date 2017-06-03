@@ -16,7 +16,7 @@
 
 **OVERVIEW**
 
-This tool extract sequences ranges from a chromosome or contig. The input file is a **tab-delimitted** range file and each line looks like this (contig name, sequence range and strand(plus or minus) )
+This tool extract sequences ranges from a chromosome or contig. The input file is a **tab or space delimited** range file and each line looks like this (contig or chromosome name, sequence range, and strand(plus or minus) )
 
 IWGSC_CSS_7AL_scaff_4491815    4033-4133    plus
 

@@ -73,8 +73,10 @@ class Primers(object):
 		self.end_stability = 0.0
 		self.seq = ""
 		self.difthreeall = "NO" # whether 3' site can differ all
+		self.difnum = 0
+		self.direction = ""
 	def formatprimer(self):
-		formatout = "\t".join(str(x) for x in [self.start, self.end, self.length, self.tm, self.gc, self.anys, self.three, self.end_stability, self.hairpin, self.seq, ReverseComplement(self.seq), self.difthreeall])
+		formatout = "\t".join(str(x) for x in [self.start, self.end, self.difnum, self.length, self.tm, self.gc, self.anys, self.three, self.end_stability, self.hairpin, self.seq, ReverseComplement(self.seq), self.difthreeall])
 		return(formatout)
 
 class PrimerPair(object):
@@ -441,6 +443,18 @@ def parse_primer3output(primer3output, primerpair_to_return):
 				continue
 	return primerpairs
 
+# function to find primer sequence variation site and highligh them in primer sequences
+def format_primer_seq(primer, variation): # input is a primer object and variation list
+	primer_range = range(primer.start - 1, primer.end)
+	var_sites = set(variation).intersection(primer_range)
+	var_sites_relative = [i - primer.start + 1 for i in var_sites]
+	#seq = primer.seq.lower()
+	seq = primer.seq
+	for i in var_sites_relative:
+		seq = seq[:i] + seq[i].upper() + seq[i+1:]
+	primer.seq = seq
+	primer.difnum = len(var_sites)
+	return primer
 
 # parse the flanking sequence input
 
@@ -763,7 +777,7 @@ def caps(seqfile):
 	#######################################
 	# write to file
 	outfile = open(out, 'w')
-	outfile.write("index\tproduct_size\ttype\tstart\tend\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\t3'differall\tpenalty\tcompl_any\tcompl_end\tPrimerID\tmatched_chromosomes\n")
+	outfile.write("index\tproduct_size\ttype\tstart\tend\tdiff_number\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\t3'differall\tpenalty\tcompl_any\tcompl_end\tPrimerID\tmatched_chromosomes\n")
 	# Get primer list for blast
 	primer_for_blast = {}
 	final_primers = {}
@@ -797,8 +811,10 @@ def caps(seqfile):
 	# write output file
 	for i, pp in final_primers.items():
 		#varsite = int(i.split("-")[-1]) # variation site
-		pl = pp.left
-		pr = pp.right
+		#pl = pp.left
+		#pr = pp.right
+		pl = format_primer_seq(pp.left, variation)
+		pr = format_primer_seq(pp.right, variation)
 		# check whether 3' can differ all: not necessary for here, because I only used sites that can differ all.
 		#if varsite in variation:
 		pl.difthreeall = "YES"
