@@ -22,7 +22,7 @@ IWGSC_CSS_7AL_scaff_4491815    4033-4133    plus
 
 IWGSC_CSS_7AL_scaff_4552312    3190-3290    plus
 
-output file is a fasta file file (50 bp flanking sequences on each side) and looks like this:
+output file is a fasta file file and looks like this:
 
 >IWGSC_CSS_7AL_scaff_4491815 4033-4133
 
