@@ -83,10 +83,14 @@ def parse_exon_snp(snpinfo):
 def prepare_seq_range(snpdict, outfile):
 	# output
 	#outfile = "temp_range.txt"
+	seq_name_list = [] # for changing the sequence names from the blastdbcmd output
 	out = open(outfile, "w")
 	for k, v in snpdict.items():
-		out.write(k + "\t" + str(v.leftpos) + "-" + str(v.rightpos) + "\n")
+		seq_name_list.append(k)
+		contig = k.split("-")[-1] # k = contig + "-" + ref_pos]
+		out.write(contig + "\t" + str(v.leftpos) + "-" + str(v.rightpos) + "\n")
 	out.close()
+	return seq_name_list
 
 # function to get the flanking sequences
 def get_flanking(range_file, flanking_file, reference):
@@ -111,6 +115,21 @@ def fasta_iter(fasta_file):
 		seq = "".join(s.strip() for s in faiter.next())
 		yield header, seq
 
+# function to extract sequences from a fasta file 
+def get_fasta(infile, seq_name_list):
+	fasta = {} # dictionary for alignment
+	n = 0 # for sequence name list index
+	with open(infile) as file_one:
+		for line in file_one:
+			line = line.strip()
+			if line.startswith(">"):
+				#sequence_name = line.split()[0].lstrip(">")
+				sequence_name = seq_name_list[n]
+				n += 1
+			else:
+				fasta.setdefault(sequence_name, "")
+				fasta[sequence_name] += line.rstrip()
+	return fasta
 
 # main function
 def main(argv):
@@ -122,13 +141,16 @@ def main(argv):
 	snpdict = parse_exon_snp(snpinfo)
 	print "length of snpdict ", len(snpdict)
 	range_file = "temp_range.txt"
-	prepare_seq_range(snpdict, range_file)
+	seq_name_list = prepare_seq_range(snpdict, range_file)
 	flanking_file = "flanking_seq.fa"
 	get_flanking(range_file, flanking_file, reference)
-	fasta = fasta_iter(flanking_file)
+	#fasta = fasta_iter(flanking_file)
+	seq_fasta = get_fasta(flanking_file, seq_name_list)
 	out = open(outfile, "w")
-	for header, seq in fasta:   
-		snp = snpdict[header]
+	#for header, seq in fasta:
+	for i in seq_name_list:
+		snp = snpdict[i]
+		seq = seq_fasta[i]
 		if (snp.leftpos == 1):
 			snp.seq = seq[0:-52] + "[" + snp.ref_allele + "/" + snp.alt_allele + "]" + seq[-50:]
 		else:
