@@ -87,7 +87,7 @@ def prepare_seq_range(snpdict, outfile):
 	out = open(outfile, "w")
 	for k, v in snpdict.items():
 		seq_name_list.append(k)
-		contig = k.split("-")[-1] # k = contig + "-" + ref_pos]
+		contig = k.split("-")[0] # k = contig + "-" + ref_pos]
 		out.write(contig + "\t" + str(v.leftpos) + "-" + str(v.rightpos) + "\n")
 	out.close()
 	return seq_name_list
