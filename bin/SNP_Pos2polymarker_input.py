@@ -27,8 +27,9 @@
 #  Copyright 2017 Junli Zhang <zhjl86@gmail.com>
 # 
 
-# example: SNP_Pos2polymarker_input.py snp_infor.txt for_polymarker.csv 1
-
+# example: 
+# SNP_Pos2polymarker_input.py <input> <output> <reference number>
+# SNP_Pos2polymarker_input.py snp_infor.txt for_polymarker.csv 1
 ##############################################
 # Modules needed
 from itertools import groupby
@@ -70,9 +71,12 @@ def parse_exon_snp(snpinfo):
 	with open(snpinfo) as infile:
 		#next(infile) # skip header
 		for line in infile:
-			contig, ref_pos, ref_allele, alt_allele = line.rstrip().split('\t')
+			line = line.strip()
+			if not line:
+				continue
+			contig, ref_pos, ref_allele, alt_allele = line.rstrip().split() # split with white space
 			#key = ",".join(col[0:3])
-			snpdict[contig] = SNP(contig, int(ref_pos), ref_allele, alt_allele)
+			snpdict[contig + "-" + ref_pos] = SNP(contig, int(ref_pos), ref_allele, alt_allele)
 	return snpdict
 
 # function to prepare file for blastdbcmd to get the flanking sequences of SNPs

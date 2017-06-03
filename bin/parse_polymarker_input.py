@@ -38,7 +38,10 @@ def main():
 
 	# get snp position
 	for line in open(polymarker_input):
-		snpname, chrom, seq = line.strip().replace(" ","").split(",")
+		line = line.strip()
+		if not line:
+			continue
+		snpname, chrom, seq = line.replace(" ","").split(",")
 		snpname = snpname.replace("_", "-") # in case there is already "_" in the snp name
 		seq = seq.strip() # in case there is space in the input file
 		pos = seq.find("[")

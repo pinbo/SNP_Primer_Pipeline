@@ -35,8 +35,11 @@ def get_flanking(range_file, flanking_file):
 # read input file
 def get_seq_name(infile):
 	seq_name_list = []
-	for line in open(infile):	
-		seq_name_list.append(line.strip().replace("\t", " "))
+	for line in open(infile):
+		line = line.strip()
+		if not line: # skip blank lines
+			continue
+		seq_name_list.append(line.replace("\t", " "))
 	return seq_name_list
 
 
