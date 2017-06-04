@@ -445,7 +445,10 @@ def parse_primer3output(primer3output, primerpair_to_return):
 
 # function to find primer sequence variation site and highligh them in primer sequences
 def format_primer_seq(primer, variation): # input is a primer object and variation list
-	primer_range = range(primer.start - 1, primer.end)
+	if primer.start < primer.end:
+		primer_range = range(primer.start - 1, primer.end)
+	else:
+		primer_range = range(primer.end - 1, primer.start)
 	var_sites = set(variation).intersection(primer_range)
 	var_sites_relative = [i - primer.start + 1 for i in var_sites]
 	#seq = primer.seq.lower()
