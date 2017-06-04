@@ -133,7 +133,7 @@ def main(argv):
 	snpdict, seq_name_list = parse_exon_snp(snpinfo)
 	print "length of snpdict ", len(snpdict)
 	range_file = "temp_range.txt"
-	prepare_seq_range(snpdict, range_file)
+	prepare_seq_range(snpdict, seq_name_list, range_file)
 	flanking_file = "flanking_seq.fa"
 	get_flanking(range_file, flanking_file, reference)
 	seq_fasta = get_fasta(flanking_file, seq_name_list)
