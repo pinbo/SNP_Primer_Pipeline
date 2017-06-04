@@ -82,12 +82,14 @@ def parse_exon_snp(snpinfo):
 	return snpdict, seq_name_list
 
 # function to prepare file for blastdbcmd to get the flanking sequences of SNPs
-def prepare_seq_range(snpdict, outfile):
+def prepare_seq_range(snpdict, seq_name_list, outfile): # seq_name_list to make sure the output order is the same as input order
 	# output
 	#outfile = "temp_range.txt"
 	#seq_name_list = [] # for changing the sequence names from the blastdbcmd output
 	out = open(outfile, "w")
-	for k, v in snpdict.items():
+	for k in seq_name_list:
+		v = snpdict[k]
+	#for k, v in snpdict.items():
 		#seq_name_list.append(k)
 		contig = k.split("-")[0] # k = contig + "-" + ref_pos]
 		out.write(contig + "\t" + str(v.leftpos) + "-" + str(v.rightpos) + "\n")
