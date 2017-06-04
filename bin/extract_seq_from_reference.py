@@ -50,8 +50,11 @@ def get_fasta(infile, seq_name_list):
 	with open(infile) as file_one:
 		for line in file_one:
 			line = line.strip()
+			if not line:
+				continue
 			if line.startswith(">"):
-				#sequence_name = line.split()[0].lstrip(">")
+				sequence_name = line.split()[0].lstrip(">")
+				seq_name_list[n] += " " + sequence_name # so I can check whether the seq_name match the seq_name_list
 				sequence_name = seq_name_list[n]
 				n += 1
 			else:

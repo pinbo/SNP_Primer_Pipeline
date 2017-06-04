@@ -68,6 +68,7 @@ class SNP:
 #chr7A	1111400000	G	C
 def parse_exon_snp(snpinfo):
 	snpdict = {} # dictionary of snp information
+	seq_name_list = [] # for changing the sequence names from the blastdbcmd output
 	with open(snpinfo) as infile:
 		#next(infile) # skip header
 		for line in infile:
@@ -77,20 +78,22 @@ def parse_exon_snp(snpinfo):
 			contig, ref_pos, ref_allele, alt_allele = line.rstrip().split() # split with white space
 			#key = ",".join(col[0:3])
 			snpdict[contig + "-" + ref_pos] = SNP(contig, int(ref_pos), ref_allele, alt_allele)
-	return snpdict
+			seq_name_list.append(contig + "-" + ref_pos)
+	return snpdict, seq_name_list
 
 # function to prepare file for blastdbcmd to get the flanking sequences of SNPs
 def prepare_seq_range(snpdict, outfile):
 	# output
 	#outfile = "temp_range.txt"
-	seq_name_list = [] # for changing the sequence names from the blastdbcmd output
+	#seq_name_list = [] # for changing the sequence names from the blastdbcmd output
 	out = open(outfile, "w")
 	for k, v in snpdict.items():
-		seq_name_list.append(k)
+		#seq_name_list.append(k)
 		contig = k.split("-")[0] # k = contig + "-" + ref_pos]
 		out.write(contig + "\t" + str(v.leftpos) + "-" + str(v.rightpos) + "\n")
 	out.close()
-	return seq_name_list
+	#return seq_name_list
+	return 0
 
 # function to get the flanking sequences
 def get_flanking(range_file, flanking_file, reference):
@@ -99,22 +102,6 @@ def get_flanking(range_file, flanking_file, reference):
 	print "Command to get the flanking sequences for each SNP\n", cmd
 	call(cmd, shell=True)
 
-# function to parse the fasta file
-def fasta_iter(fasta_file):
-	"""
-	given a fasta file. yield tuples of header, sequence
-	"""
-	fh = open(fasta_file)
-	# ditch the boolean (x[0]) and just keep the header or sequence since
-	# we know they alternate.
-	faiter = (x[1] for x in groupby(fh, lambda line: line[0] == ">"))
-	for header in faiter:
-	       # drop the ">"
-		header = header.next()[1:].strip()
-		# join all sequence lines to one.
-		seq = "".join(s.strip() for s in faiter.next())
-		yield header, seq
-
 # function to extract sequences from a fasta file 
 def get_fasta(infile, seq_name_list):
 	fasta = {} # dictionary for alignment
@@ -122,8 +109,11 @@ def get_fasta(infile, seq_name_list):
 	with open(infile) as file_one:
 		for line in file_one:
 			line = line.strip()
+			if not line:
+				continue
 			if line.startswith(">"):
-				#sequence_name = line.split()[0].lstrip(">")
+				sequence_name = line.split()[0].lstrip(">")
+				seq_name_list[n] += " " + sequence_name # so I can check whether the seq_name match the seq_name_list
 				sequence_name = seq_name_list[n]
 				n += 1
 			else:
@@ -138,18 +128,17 @@ def main(argv):
 	reference_list = ["/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_v2_ChrU.fa", 
 	"/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta"]
 	reference = reference_list[int(argv[3]) - 1] # 1 or 2 for reference
-	snpdict = parse_exon_snp(snpinfo)
+	snpdict, seq_name_list = parse_exon_snp(snpinfo)
 	print "length of snpdict ", len(snpdict)
 	range_file = "temp_range.txt"
-	seq_name_list = prepare_seq_range(snpdict, range_file)
+	prepare_seq_range(snpdict, range_file)
 	flanking_file = "flanking_seq.fa"
 	get_flanking(range_file, flanking_file, reference)
-	#fasta = fasta_iter(flanking_file)
 	seq_fasta = get_fasta(flanking_file, seq_name_list)
 	out = open(outfile, "w")
 	#for header, seq in fasta:
 	for i in seq_name_list:
-		snp = snpdict[i]
+		snp = snpdict[i.split()[0]]
 		seq = seq_fasta[i]
 		if (snp.leftpos == 1):
 			snp.seq = seq[0:-52] + "[" + snp.ref_allele + "/" + snp.alt_allele + "]" + seq[-50:]
