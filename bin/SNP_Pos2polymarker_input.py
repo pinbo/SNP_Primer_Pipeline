@@ -113,9 +113,9 @@ def get_fasta(infile, seq_name_list):
 				continue
 			if line.startswith(">"):
 				sequence_name = line.split()[0].lstrip(">")
-				seq_name_list[n] += " " + sequence_name # so I can check whether the seq_name match the seq_name_list
-				sequence_name = seq_name_list[n]
-				n += 1
+				if sequence_name in seq_name_list[n]: # in case seq name mismatch
+					sequence_name = seq_name_list[n]
+					n += 1
 			else:
 				fasta.setdefault(sequence_name, "")
 				fasta[sequence_name] += line.rstrip()
@@ -138,7 +138,7 @@ def main(argv):
 	out = open(outfile, "w")
 	#for header, seq in fasta:
 	for i in seq_name_list:
-		snp = snpdict[i.split()[0]]
+		snp = snpdict[i]
 		seq = seq_fasta[i]
 		if (snp.leftpos == 1):
 			snp.seq = seq[0:-52] + "[" + snp.ref_allele + "/" + snp.alt_allele + "]" + seq[-50:]
