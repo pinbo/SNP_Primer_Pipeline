@@ -333,12 +333,12 @@ def format_primer_seq(primer, variation): # input is a primer object and variati
 	if primer.start < primer.end:
 		start = primer.start
 		end = primer.end
-		seq = primer.seq
+		seq = primer.seq.lower()
 		#primer_range = range(primer.start - 1, primer.end)
 	else:
 		start = primer.end
 		end = primer.start
-		seq = ReverseComplement(primer.seq)
+		seq = ReverseComplement(primer.seq.lower())
 		#primer_range = range(primer.end - 1, primer.start)
 	
 	primer_range = range(start - 1, end)
