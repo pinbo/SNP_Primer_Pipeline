@@ -36,21 +36,23 @@ I divided the pipeline into 8 steps:
 - Split the range file for each marker with system command "awk"
 - Get flanking sequences for each file with command "blastdbcmd"
 - Get KASP primers using script "getkasp3.py"
-- Prepare SNP2CAPS.pl input file using script "parse_polymarker_input_for_CAPS.py"
-- Run SNP2CAPS script to find all potential Restriciton enzymes
+- Get CAPS primers using script "getCAPS.py"
+- Blast the primers against the wheat pseudomolecule v1.0
 
-The last 2 steps were not for designing KASPars but for CAPS marker design.
 
 You can run this step by step or run the whole pipeline with script "run_getkasp.py". I suggest run the 6 steps in the script "run_getkasp.py" stey by step to get familiar how it works first.
 
-Example: `run_getkasp.py for_polymarker.csv 3`
+Example: `run_getkasp.py for_polymarker.csv 3 200 1 1 1`
+
+Inputs are: ploidy, enzyme maximum price (per 1000 U), whether to design CAPS (1 for yes and 0 for NO), whether to design KASP (1 for yes and 0 for NO), whether to blast primers (1 for yes and 0 for NO)
 
 Change the software paths, blast contig names and locations etc accordingly.
 
 The "bin" folder has all the scripts for each step and softare primer3 and muscle in case your system does not have them.
 
 # Main Changes
-- 5/14/2017 Added steps to check restriciton enzymes for CAPS marker design.
+- 06/05/2017 Added step to design both CAPS and dCAPS primers using the restriction enzyme list from NEB.
+- 05/14/2017 Added steps to check restriciton enzymes for CAPS marker design.
 - Added ploidy parameter for wheat species in different ploidy.
 
 # Acknowledgements
