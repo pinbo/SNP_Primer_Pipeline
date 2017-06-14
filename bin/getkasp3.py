@@ -405,7 +405,7 @@ def kasp(seqfile):
 			seq_template = seq_template[:snp_site] +  alt_allele + seq_template[snp_site + 1:]
 		settings_common = "PRIMER_TASK=generic" + "\n" + \
 		"SEQUENCE_TEMPLATE=" + seq_template + "\n" + \
-		"PRIMER_PRODUCT_SIZE_RANGE=50-150" + "\n" + \
+		"PRIMER_PRODUCT_SIZE_RANGE=50-100 100-150" + "\n" + \
 		"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getkasp_path + "/primer3_config/"  + "\n" + \
 		"PRIMER_MAX_SIZE=25" + "\n" + \
 		"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
