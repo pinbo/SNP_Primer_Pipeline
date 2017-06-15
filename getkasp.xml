@@ -62,6 +62,15 @@ Restriction Enzymes used in this tool are all from NEB. And the prices were obta
 
 I processed these enzymes and enzymes with the same recognization sequences were merged together. For example, MspI and HpaII both recognize "ccgg", so I give them the name "MspI,HpaII,13"; the number in the end is the lowest price (US dolloars per 1000 U) of the enzyme group.
 
+
+**FAM and VIC/HEX tails**
+
+FAM	GAAGGTGACCAAGTTCATGCT
+
+VIC	GAAGGTCGGAGTCAACGGATT
+
+You should add FAM and VIC tails for the two allele specific primers.
+
 ------
 
 **Output Format**
@@ -110,7 +119,7 @@ CSS7AL4435040-1801-dCAPS-HhaI,HinP1I,29-gcgc-312-502-0	229	RIGHT	520	502	0	19	59
 
 For dCAPS primers, primers with the introduced mutations have to be close to the SNP, so primers with end position close to 501 are the primers with introduced mutations (I got 500 bp each side of the SNP), and the other primer is the primer to insure the pair is chromosome specific. For the primers with introduced mutations, the captital letters mean the introduced mutation, and for the other primer, the capital letters are the unique nts.
 
-dCAPS product size is set 70 bp to 350 bp, usually 100 bp to 200 bp is better.
+dCAPS product size is set 70 bp to 350 bp, usually 100 bp to 200 bp is better. **One trick: add a FAM or VIC tail in the primer with the introduced mutation can make the difference about 40 bp**
 
 **CAPS primers**
 
