@@ -536,7 +536,7 @@ def caps(seqfile):
 		p3input = open(primer3input, 'w')
 		# for dcaps
 		product_min = 70
-		product_max = 350
+		product_max = 250
 		n = 0 # number to see how many records were written to primer3 input file
 		for enzyme in dcaps_list:
 			for primer_end_pos in enzyme.primer_end_pos: # a list of potential end positions
@@ -551,7 +551,7 @@ def caps(seqfile):
 				settings = "PRIMER_TASK=generic" + "\n" + \
 				"SEQUENCE_ID=" + snpname + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(primer_end_pos+1) + "\n" + \
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
-				"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
+				"PRIMER_PRODUCT_SIZE_RANGE=150-200 200-250 70-150" + "\n" + \
 				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
 				"PRIMER_MAX_SIZE=25" + "\n" + \
 				"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
