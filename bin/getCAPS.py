@@ -76,7 +76,7 @@ class Primers(object):
 		self.difnum = 0
 		self.direction = ""
 	def formatprimer(self):
-		formatout = "\t".join(str(x) for x in [self.start, self.end, self.difnum, self.length, self.tm, self.gc, self.anys, self.three, self.end_stability, self.hairpin, self.seq, ReverseComplement(self.seq), self.difthreeall])
+		formatout = "\t".join(str(x) for x in [self.start, self.end, self.difnum, self.difthreeall, self.length, self.tm, self.gc, self.anys, self.three, self.end_stability, self.hairpin, self.seq, ReverseComplement(self.seq)])
 		return(formatout)
 
 class PrimerPair(object):
@@ -791,7 +791,7 @@ def caps(seqfile):
 	#######################################
 	# write to file
 	outfile = open(out, 'w')
-	outfile.write("index\tproduct_size\ttype\tstart\tend\tdiff_number\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\t3'differall\tpenalty\tcompl_any\tcompl_end\tPrimerID\tmatched_chromosomes\n")
+	outfile.write("index\tproduct_size\ttype\tstart\tend\tdiff_number\t3'differall\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\tpenalty\tcompl_any\tcompl_end\tPrimerID\tmatched_chromosomes\n")
 	# Get primer list for blast
 	primer_for_blast = {}
 	final_primers = {}
