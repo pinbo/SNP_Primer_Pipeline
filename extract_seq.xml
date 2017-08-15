@@ -7,6 +7,7 @@
         <option value="1">IWGSC_v2_ChrU</option>
         <option value="2">IWGSC_CSS_AB-TGAC_UCW_v1</option>
 		<option value="3">Chinese_Spring_v1.0_pseudomolecules</option>
+		<option value="4">IWGSC_6x_and_4x_withU</option>
     </param>
   </inputs>
   <outputs>
