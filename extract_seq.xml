@@ -5,7 +5,8 @@
     <param format="txt" name="input" type="data" label="Tab-delimited file"/>
     <param name="reference" type="select" label="Which reference to use?" help="If your contig from IWGSC contigs (such as IWGSC_CSS_7AL_scaff_4491815), then choose the first 1; if it is from CS pseudomolecule v1.0, then choose the 2nd">
         <option value="1">IWGSC_v2_ChrU</option>
-        <option value="2">Chinese_Spring_v1.0_pseudomolecules</option>
+        <option value="2">IWGSC_CSS_AB-TGAC_UCW_v1</option>
+		<option value="3">Chinese_Spring_v1.0_pseudomolecules</option>
     </param>
   </inputs>
   <outputs>
