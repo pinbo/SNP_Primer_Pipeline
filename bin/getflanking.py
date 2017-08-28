@@ -38,7 +38,7 @@ if genome_number not in [1, 2, 3]:
 	sys.exit("Genome number need to be either 1, 2, or 3")
 
 genomes = "ABD"
-genomes = genomes[:genome_number] # final genomes
+genomes = genomes[:genome_number] + "n" # final genomes + chrUn
 
 # get snp position
 snp_pos = {}
