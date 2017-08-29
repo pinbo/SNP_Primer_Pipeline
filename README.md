@@ -1,8 +1,15 @@
 # getKASP_pipeline
 
-These scripts make a simple pipeline to design KASP (Kompetitive Allele Specific PCR) primers.
+These scripts make a simple pipeline to design **KASP** (Kompetitive Allele Specific PCR) and **CAPS/dCAPS** primers for SNP genotyping. It is actually now more proper to call it **SNP Primer Design Pipeline**.
 
 Polymarker (http://polymarker.tgac.ac.uk/) is a great software to design KASP primers, but sometimes I have some specific requirements that Polymarker cannot meet, and it is difficult for me to modify its scripts because I do not know Ruby. That is why I wrote these simple scripts to just meet my requirements.
+
+# Main Changes
+- 08/29/2017 Included xml files for used in galaxy
+- 08/29/2017 Added a script for extracting sequences in the reference file.
+- 06/05/2017 Added step to design both CAPS and dCAPS primers using the restriction enzyme list from NEB.
+- 05/14/2017 Added steps to check restriciton enzymes for CAPS marker design.
+- Added ploidy parameter for wheat species in different ploidy.
 
 # Pseudo code
 1. Read the polymarker input and get:
@@ -19,9 +26,8 @@ getKASP_pipeline needs following 3 software to find differences among homeologs 
 1. Muscle: Multiple sequence alignment program (http://www.drive5.com/muscle/)
 2. Primer3: program for designing PCR primers (http://primer3.sourceforge.net/)
 3. blast+ package from NCBI (https://blast.ncbi.nlm.nih.gov/Blast.cgi)
-4. SNP2CAPS.pl: a modified version to check all the restriction enzymes for the snp site (http://pgrc.ipk-gatersleben.de/snp2caps/)
 
-Please make sure "muscle", "primer3_core" and "blastn" are in the software PATH. Otherwise, please modify specific scripts and give the software path.
+"muscle" and "primer3_core" are included in the package, but "blast+" should be installed in the your system.
 
 # How it works
 1. Find all the different sites that can differ all other sequences from the user provided alignment file;
@@ -49,11 +55,6 @@ Inputs are: ploidy, enzyme maximum price (per 1000 U), whether to design CAPS (1
 Change the software paths, blast contig names and locations etc accordingly.
 
 The "bin" folder has all the scripts for each step and softare primer3 and muscle in case your system does not have them.
-
-# Main Changes
-- 06/05/2017 Added step to design both CAPS and dCAPS primers using the restriction enzyme list from NEB.
-- 05/14/2017 Added steps to check restriciton enzymes for CAPS marker design.
-- Added ploidy parameter for wheat species in different ploidy.
 
 # Acknowledgements
 I borrowed ideas from the polymarker scripts (https://github.com/TGAC/bioruby-polyploid-tools), a great tool for Genome Specific KASPar design in polyploid species. Thanks to the author of Polymarker.
