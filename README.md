@@ -1,10 +1,10 @@
-# getKASP_pipeline
-
-These scripts make a simple pipeline to design **KASP** (Kompetitive Allele Specific PCR) and **CAPS/dCAPS** primers for SNP genotyping. It is actually now more proper to call it **SNP Primer Design Pipeline**.
+# SNP Primer Design Pipeline
+These scripts make a simple pipeline to design **KASP** (Kompetitive Allele Specific PCR) and **CAPS/dCAPS** primers for SNP genotyping. 
 
 Polymarker (http://polymarker.tgac.ac.uk/) is a great software to design KASP primers, but sometimes I have some specific requirements that Polymarker cannot meet, and it is difficult for me to modify its scripts because I do not know Ruby. That is why I wrote these simple scripts to just meet my requirements.
 
 # Main Changes
+- 12/20/2017 Renamed the repository from "getKASP_pipeline" to "SNP_Primer_Pipeline"
 - 08/29/2017 Included xml files for used in galaxy
 - 08/29/2017 Added a script for extracting sequences in the reference file.
 - 06/05/2017 Added step to design both CAPS and dCAPS primers using the restriction enzyme list from NEB.
@@ -22,7 +22,7 @@ Polymarker (http://polymarker.tgac.ac.uk/) is a great software to design KASP pr
 
 # Dependencies
 
-getKASP_pipeline needs following 3 software to find differences among homeologs and design primer.
+SNP_Primer_Pipeline needs following 3 software to find differences among homeologs and design primer.
 1. Muscle: Multiple sequence alignment program (http://www.drive5.com/muscle/)
 2. Primer3: program for designing PCR primers (http://primer3.sourceforge.net/)
 3. blast+ package from NCBI (https://blast.ncbi.nlm.nih.gov/Blast.cgi)
