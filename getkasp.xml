@@ -14,8 +14,8 @@
         <option value="0">No</option>
     </param>
     <param name="blast" type="select" label="Blast the output primers in the wheat genome?" help="If yes, will blast against Chinese_Spring_v1.0_pseudomolecules.">
-        <option value="1">Yes</option>
         <option value="0">No</option>
+	<option value="1">Yes</option>
     </param>
   </inputs>
   <outputs>
