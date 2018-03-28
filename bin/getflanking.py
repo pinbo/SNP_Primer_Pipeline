@@ -85,7 +85,8 @@ for line in open(blast_file):
 	#print qchrom, schrom
 	if schrom[1] not in genomes:
 		continue
-	pct_identity = float(fields[2])
+	#pct_identity = float(fields[2]) # big gaps cause low identity
+	pct_identity = 100 - (float(fields[4]) + float(fields[5])) / float(fields[3]) * 100 # to avoid big gaps
 	align_length = int(fields[3])
 	if snp not in snp_size_list:
 		snp_size_list.append(snp)
