@@ -63,12 +63,13 @@ class Restriction_Enzyme(object):
 		self.seq = seq.lower()
 		self.length = len(seq)
 		self.template_seq = ""
-		self.primer_end_pos = None
+		self.primer_end_pos = [] # a list of end positions
 		self.caps = "No"
 		self.dcaps = "No"
 		self.allpos = [] # all the match positions in the template
 		self.change_pos = None
 		self.price = int(name.split(',')[-1])
+		self.primer_direction = "" # to use the end positions as left or right primer
 
 class Primers(object):
 	"""A primer set designed by Primer3"""
@@ -97,6 +98,17 @@ class PrimerPair(object):
 		self.left = Primers()
 		self.right = Primers()
 		self.compl_any = "NA"
+		self.compl_end = "NA"
+		self.penalty = "NA"
+		self.product_size = 0
+		
+# sequence class with allele sequence and position
+class caps_seq(object):
+	"""sequence with allele sequence and positions"""
+	def __init__(self):
+		self.refseq = "" # reference template
+		self.ref = Primers() # ref allele: SNP_A
+		self.alt = "" # alt allele: SNP_B
 		self.compl_end = "NA"
 		self.penalty = "NA"
 		self.product_size = 0
@@ -195,6 +207,13 @@ def ReverseComplement(seq):
 
 def string_dif(s1, s2): # two strings with equal length
 	return [i for i in xrange(len(s1)) if s1[i] != s2[i]]
+	
+def dif_region(s1, s2): # two strings with equal length
+	s1r = s1[::-1] # reverse the string
+	s2r = s2[::-1] # reverse the string
+	L1 = [i for i in xrange(min([len(s1),len(s2)])) if s1[i] != s2[i]] # forward
+	L2 = [i for i in xrange(min([len(s1),len(s2)])) if s1r[i] != s2r[i]] # reverse
+	return [L1[0], len(s1) - L2[0] - 1] # differ positions for forward and reverse on the template
 
 def seq2pattern(seq):
 	iupac = {
@@ -219,35 +238,54 @@ def seq2pattern(seq):
 			seq2 += iupac[i]
 	return seq2.lower()
 
-def check_pattern(enzyme, wild_seq, mut_seq, snp_pos): # check whether enzyme can match wild_seq after 1 base change but not mut_seq
+def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match wild_seq after 1 base change but not mut_seq
+	wild_seq = wild_seq.lower()
+	mut_seq = mut_seq.lower()
+	pos_L, pos_R = dif_region(wild_seq, mut_seq) # differnce region borders in the wild_seq
+	#print "pos_L, pos_R ", pos_L, pos_R
 	enzyme_name = enzyme.name
-	enzyme_seq = enzyme.seq
+	enzyme_seq = enzyme.seq.strip("n") # some enzyme has sequence beginning and ending with n, such as TspRI,72, nncastgnn
 	for i in range(len(enzyme_seq)):
 		ss = seq2pattern(enzyme_seq[0:i]) + "[atgc]" + seq2pattern(enzyme_seq[i+1:]) # regular expression
+		#print "find_substring(ss, wild_seq), ", i, find_substring(ss, wild_seq)
+		#print "find_substring(ss, mutt_seq), ", i, find_substring(ss, mut_seq) 
+		#if len(re.findall(ss, wild_seq)) != len(re.findall(ss, mut_seq)): # differnt length should be caused by the differnce in the SNP/indel
+		if find_substring(ss, wild_seq) != find_substring(ss, mut_seq): # even they are the same length, if the start position is different, it is still okay
 		#print "Enzyme, Enzyme seq, pattern ", enzyme_name, enzyme_seq, ss
-		for m in re.finditer(ss, wild_seq):
-			if snp_pos in range(m.start(), m.end()) and not re.search(ss, mut_seq[m.start():m.end()]):
+			for m in re.finditer(ss, wild_seq):
+				#if snp_pos in range(m.start(), m.end()) and not re.search(ss, mut_seq[m.start():m.end()]):
 				change_pos = m.start() + i # which was changed
-				if abs(snp_pos - change_pos) > 1: # to insure the introduced mutaton is at least 2 bases far from the snp
+				if pos_L in range(m.start(), m.end()) and pos_L - change_pos > 1:
+					enzyme.primer_direction = "left" # use as left primer end positions
+					enzyme.primer_end_pos += range(change_pos + 1, pos_L)
+					change_pos = m.start() + i # which was changed
 					print "One nt can be changed to fit enzyme", enzyme.name
 					enzyme.dcaps = "Yes"
 					enzyme.template_seq = wild_seq[:change_pos] + enzyme_seq[i].upper() + wild_seq[change_pos+1:]
 					enzyme.change_pos = change_pos
-					if change_pos < snp_pos:
-						enzyme.primer_end_pos = range(change_pos + 1, snp_pos) # a list of primer end positions
-					else:
-						enzyme.primer_end_pos = range(snp_pos + 1, change_pos) # a list of primer end positions
+					print "change position and primer end postions are ", change_pos, enzyme.primer_end_pos
+					break
+				
+				if pos_R in range(m.start(), m.end()) and change_pos - pos_R > 1:
+					enzyme.primer_direction = "right" # use as right primer end positions
+					enzyme.primer_end_pos += range(pos_R + 1, change_pos)
+					change_pos = m.start() + i # which was changed
+					print "One nt can be changed to fit enzyme", enzyme.name
+					enzyme.dcaps = "Yes"
+					enzyme.template_seq = wild_seq[:change_pos] + enzyme_seq[i].upper() + wild_seq[change_pos+1:]
+					enzyme.change_pos = change_pos
 					print "change position and primer end postions are ", change_pos, enzyme.primer_end_pos
 					break
 		# break the loop if dcaps found
 		if enzyme.dcaps == "Yes":
 			break
+		#enzyme.primer_end_pos = list(set(enzyme.primer_end_pos)) # not necessary since I already made the break if one change positon were found
 	return enzyme
 
 def find_substring(substring, string): # find all the starting index of a substring
 	return [m.start() for m in re.finditer(substring, string)]
 
-def test_enzyme(enzyme, wild_seq, mut_seq, snp_pos): # enzyme is an Restriction_Enzyme object
+def test_enzyme(enzyme, wild_seq, mut_seq): # enzyme is an Restriction_Enzyme object
 	enzyme_seq = enzyme.seq
 	enzyme_seq_RC = ReverseComplement(enzyme_seq) # 1
 	enzyme_name = enzyme.name
@@ -266,14 +304,14 @@ def test_enzyme(enzyme, wild_seq, mut_seq, snp_pos): # enzyme is an Restriction_
 	# else no caps found, check dcaps
 	#snp_pos = string_dif(wild_seq, mut_seq)[0] # snp position in the template
 	#print "snp_pos is", snp_pos
-	enzyme = check_pattern(enzyme, wild_seq, mut_seq, snp_pos)
+	enzyme = check_pattern(enzyme, wild_seq, mut_seq)
 	if enzyme.dcaps != "Yes":
-		enzyme = check_pattern(enzyme, mut_seq, wild_seq, snp_pos)
+		enzyme = check_pattern(enzyme, mut_seq, wild_seq)
 	if enzyme.dcaps != "Yes" and enzyme_seq_RC != enzyme_seq:
 		enzyme.seq = enzyme_seq_RC
-		enzyme = check_pattern(enzyme, wild_seq, mut_seq, snp_pos)
+		enzyme = check_pattern(enzyme, wild_seq, mut_seq)
 	if enzyme.dcaps != "Yes" and enzyme_seq_RC != enzyme_seq:
-		enzyme = check_pattern(enzyme, mut_seq, wild_seq, snp_pos)
+		enzyme = check_pattern(enzyme, mut_seq, wild_seq)
 	return enzyme
 
 # function to count mismtaches
@@ -474,7 +512,7 @@ def format_primer_seq(primer, variation): # input is a primer object and variati
 
 # parse the flanking sequence input
 
-def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now support indels or long haplotypes
+def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now support indels or long haplotypes, SNP_A is the template allele (or reference allel)
 	#flanking_temp_marker_IWB1855_7A_R_251.fa
 	#snpname, chrom, allele, pos =re.split("_|\.", seqfile)[3:7]
 	#chrom = chrom[0:2] # no arm
@@ -508,14 +546,15 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 	#SNP_A, SNP_B = iupac[allele] # SNP 2 alleles
 	print "SNP_A, SNP_B ", SNP_A, SNP_B # two alleles now support indels or long haplotypes
 	wild_seq = seq_template[:snp_pos] + SNP_A + seq_template[snp_pos+len(SNP_A):]
-	mut_seq = seq_template[:snp_pos] + SNP_B + seq_template[snp_pos+len(SNP_B):]
+	mut_seq = seq_template[:snp_pos] + SNP_B + seq_template[snp_pos+len(SNP_A):]
+	pos_L, pos_R = dif_region(wild_seq, mut_seq) # differnce region borders in the wild_seq, use this instead of snp_pos to decide use as left end or right end 
 	caps_list = []
 	dcaps_list = []
 	for k in REs:
 		enzyme = REs[k]
 		if enzyme.price > max_price:
 			continue
-		enzyme = test_enzyme(enzyme, wild_seq, mut_seq, snp_pos)
+		enzyme = test_enzyme(enzyme, wild_seq, mut_seq)
 		if enzyme.caps == "Yes":
 			caps_list.append(enzyme)
 		elif enzyme.dcaps == "Yes":
@@ -543,7 +582,7 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 		n = 0 # number to see how many records were written to primer3 input file
 		for enzyme in dcaps_list:
 			for primer_end_pos in enzyme.primer_end_pos: # a list of potential end positions
-				if primer_end_pos > snp_pos:
+				if enzyme.primer_direction == "right":
 					left_end = -1000000
 					right_end = primer_end_pos + 1
 				else:
@@ -556,7 +595,7 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 				"PRIMER_PRODUCT_SIZE_RANGE=150-200 200-250 70-150" + "\n" + \
 				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-				"PRIMER_MAX_SIZE=25" + "\n" + \
+				"PRIMER_MAX_SIZE=30" + "\n" + \
 				"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
 				"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
 				"PRIMER_LIBERAL_BASE=1" + "\n" + \
@@ -589,7 +628,7 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 			"SEQUENCE_TARGET=" + str(snp_pos - 20) + ",40" + "\n" + \
 			"="
 			n += 1
-			p3input.write(settings + "\n")	
+			p3input.write(settings + "\n")
 
 		p3input.close()
 		
@@ -711,7 +750,8 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 		for enzyme in dcaps_list:
 			for primer_end_pos in enzyme.primer_end_pos: # a list of potential end positions
 				for i in variation:
-					if primer_end_pos > snp_pos:
+					#if primer_end_pos > snp_pos:
+					if enzyme.primer_direction == "right":
 						left_end = i + 1
 						right_end = primer_end_pos + 1
 					else:
@@ -724,7 +764,7 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 					"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 					"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 					"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-					"PRIMER_MAX_SIZE=25" + "\n" + \
+					"PRIMER_MAX_SIZE=30" + "\n" + \
 					"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
 					"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
 					"PRIMER_LIBERAL_BASE=1" + "\n" + \
