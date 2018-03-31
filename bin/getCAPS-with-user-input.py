@@ -585,7 +585,8 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 	#snp_pos = int(pos) - 1 # 0-based
 	#print "snpname, chrom, allele, pos ", snpname, chrom, allele, pos
 	snp_pos = snp_pos - 1 # 0-based
-	snpname = re.sub(".fa|.fasta","", seqfile)
+	#snpname = re.sub(".fa|.fasta","", seqfile)
+	snpname = "SNP"
 	getcaps_path = os.path.dirname(os.path.realpath(__file__))
 	directory = "CAPS_output"
 	if not os.path.exists(directory):
