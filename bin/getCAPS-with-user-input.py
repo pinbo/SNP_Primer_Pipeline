@@ -427,7 +427,7 @@ def get_fasta(infile):
 				sequence_name = line.split()[0].lstrip(">")
 			else:
 				fasta.setdefault(sequence_name, "")
-				fasta[sequence_name] += line.rstrip()
+				fasta[sequence_name] += line.strip().replace(" ", "") # remove spaces in case
 	return fasta
 
 # in case multiple hit in the same chromosome in the psudomolecule
