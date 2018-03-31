@@ -590,7 +590,8 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 	directory = "CAPS_output"
 	if not os.path.exists(directory):
 		os.makedirs(directory)
-	out = directory + "/selected_CAPS_primers_" + snpname + ".txt"
+	#out = directory + "/selected_CAPS_primers_" + snpname + ".txt"
+	out = directory + "/selected_CAPS_primers.txt"
 	print "Output selected CAPS file name is: ", out
 	
 	# software path
@@ -631,7 +632,8 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 	variation2 = [] # variation sites that can differ at least 2 homeologs
 	
 	# STEP 0: create alignment file and primer3output file
-	RawAlignFile = "alignment_raw_" + seqfile
+	#RawAlignFile = "alignment_raw_" + seqfile
+	RawAlignFile = "alignment_raw.fa"
 	alignmentcmd = muscle_path + " -in " + seqfile + " -out " + RawAlignFile + " -quiet"
 	print "Alignment command: ", alignmentcmd
 	call(alignmentcmd, shell=True)

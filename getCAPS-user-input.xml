@@ -1,13 +1,13 @@
-<tool id="GetCAPSwithUserInput" name="Homeolog Specific dCAPS/CAPS Primer Design for SNP/indels">
+<tool id="GetCAPSwithUserInput" name="Homeolog Specific CAPS/dCAPS Primer Design for SNP/indels">
   <description>for homeolog sequences in a fasta file</description>
   <command interpreter="python">bin/getCAPS-with-user-input.py -i $input -t $target -r $ref -a $alt -p $pos -m $max_price --mintm $mintm --maxtm $maxtm --minsize $minsize --maxsize $maxsize</command>
   
   <inputs>
     <param format="fasta" name="input" type="data" label="Homeolog sequences (a fasta file with all the homeolog sequences)"/>
     <param name="target" size="100" type="text" value="" label="Primer target sequence name in the fasta file"/>
+    <param name="pos" size="4" type="integer" value="" label="The position of the reference allele in the template in the fasta file"/>
     <param name="ref" size="100" type="text" value="" label="Reference allele (the allele in the fasta file)"/>
     <param name="alt" size="100" type="text" value="" label="Alternative allele"/>
-    <param name="pos" size="4" type="integer" value="" label="The position of the reference allele in the template in the fasta file"/>
     <param name="max_price" size="4" type="integer" value="200" label="Maximum NEB restriction enzyme price (dollars per 1000 U)"/>
 	<param name="mintm" size="4" type="integer" value="57" label="Minimum primer Tm"/>
 	<param name="maxtm" size="4" type="integer" value="63" label="Maximum primer Tm"/>
@@ -16,11 +16,9 @@
   </inputs>
 
   <outputs>
-    <data format="tabular" name="output">
-        <discover_datasets pattern="alignment_raw" format="fasta" directory="." visible="true" label="${tool.name} Sequence Alignments"/>
-		<discover_datasets pattern="selected_CAPS_primers" format="tabular" directory="./CAPS_output" visible="true" label="${tool.name} CAPS primer output"/>
-    </data>
-</outputs>
+      <data format="fasta" name="alignment" from_work_dir="alignment_raw.fa" label="${tool.name} Sequence Alignments"/>
+      <data format="tabular" name="CAPS" from_work_dir="CAPS_output/selected_CAPS_primers.txt" label="${tool.name} CAPS primer output"/>
+  </outputs>
 
   <help>
 
