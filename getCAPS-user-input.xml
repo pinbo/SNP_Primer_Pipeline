@@ -1,0 +1,94 @@
+<tool id="GetCAPSwithUserInput" name="Homeolog Specific dCAPS/CAPS Primer Design for SNP/indels">
+  <description>for homeolog sequences in a fasta file</description>
+  <command interpreter="python">bin/getCAPS-with-user-input.py -i $input -t $target -r $ref -a $alt -p $pos -m $max_price --mintm $mintm --maxtm $maxtm --minsize $minsize --maxsize $maxsize
+  
+  <inputs>
+    <param format="fasta" name="input" type="data" label="Homeolog sequences (a fasta file with all the homeolog sequences)"/>
+    <param name="target" size="100" type="text" value="" label="Primer target sequence name in the fasta file"/>
+    <param name="ref" size="100" type="text" value="" label="Reference allele (the allele in the fasta file)"/>
+    <param name="alt" size="100" type="text" value="" label="Alternative allele"/>
+    <param name="pos" size="4" type="integer" value="" label="The position of the reference allele in the template in the fasta file"/>
+    <param name="max_price" size="4" type="integer" value="200" label="Maximum NEB restriction enzyme price (dollars per 1000 U)"/>
+	<param name="mintm" size="4" type="integer" value="57" label="Minimum primer Tm"/>
+	<param name="maxtm" size="4" type="integer" value="63" label="Maximum primer Tm"/>
+	<param name="minsize" size="4" type="integer" value="18" label="Minimum primer size"/>
+	<param name="maxsize" size="4" type="integer" value="25" label="Maximum primer size"/>
+  </inputs>
+
+  <outputs>
+    <data format="tabular" name="output">
+        <discover_datasets pattern="alignment_raw" format="fasta" directory="." visible="true" label="${tool.name} Sequence Alignments"/>
+		<discover_datasets pattern="selected_CAPS_primers" format="tabular" directory="./CAPS_output" visible="true" label="${tool.name} CAPS primer output"/>
+    </data>
+</outputs>
+
+  <help>
+
+**OVERVIEW**
+
+Design genome specific CAPS/dCAPS primers from user provided homeolog sequences using Muscle and Primer3
+
+------
+
+**Output**
+
+There will be 2 outputs:
+
+1. Multiple sequence alignment file for each marker
+
+2. primer pairs for CAPS/dCAPS design
+
+------
+
+**dCAPS primers**
+
+**index	product_size	type	start	end	diff_number	length	Tm	GCcontent	any	3'	end_stability	hairpin	primer_seq	ReverseComplement	3'differall	penalty	compl_any	compl_end	PrimerID	matched_chromosomes**
+
+CSS7AL4435040-1801-dCAPS-HhaI,HinP1I,29-gcgc-312-502-0	229	LEFT	292	312	1	21	60.134	47.619	0.0	0.0	3.09	32.98	accaaaggtgttcacggcttA	Taagccgtgaacacctttggt	YES	2.576185	0.00	0.00	L11	;chr7A:674139835;chr5D:47531811;chr5A:37935864;chr7B:661719815
+
+CSS7AL4435040-1801-dCAPS-HhaI,HinP1I,29-gcgc-312-502-0	229	RIGHT	520	502	0	19	59.558	63.158	20.69	0.0	4.85	43.94	gagatggtaccggtctgGc	gCcagaccggtaccatctc	YES	2.576185	0.00	0.00	R4	
+
+For dCAPS primers, primers with the introduced mutations have to be close to the SNP, so primers with end position close to 501 are the primers with introduced mutations (I got 500 bp each side of the SNP), and the other primer is the primer to insure the pair is chromosome specific. For the primers with introduced mutations, the captital letters mean the introduced mutation, and for the other primer, the capital letters are the unique nts.
+
+dCAPS product size is set 70 bp to 350 bp, usually 100 bp to 200 bp is better. **One trick: add a FAM or VIC tail in the primer with the introduced mutation can make the difference about 40 bp**
+
+------
+
+**CAPS primers**
+
+**index	product_size	type	start	end	diff_number	length	Tm	GCcontent	any	3'	end_stability	hairpin	primer_seq	ReverseComplement	3'differall	penalty	compl_any	compl_end	PrimerID	matched_chromosomes**
+
+CSS7AL4506666-1053-CAPS-BsaJI,66-ccnngg-243-0	325	LEFT	224	243	9	20	59.746	55	0	0	2.75	30.59	acTGcacCatCcACCagaTC	GAtctGGTgGatGgtgCAgt	YES	0.290188	12.48	12.48	L1	;chr7A:673418771
+
+CSS7AL4506666-1053-CAPS-BsaJI,66-ccnngg-243-0	325	RIGHT	548	529	0	20	60.036	60	0	0	4.61	39.25	ctaggagcacaaggtgggtg	cacccaccttgtgctcctag	YES	0.290188	12.48	12.48	R1	;chr7A:673419095
+
+For CAPS primers, I only set the 1 of the primer 3' end as the unique nt in the template, and let Primer3 choose another one. The product size is set from 300 bp to 900 bp.
+
+------
+
+**How to select primers from the output**
+
+1. Genomic specific: 
+
+	-variation sites close to 3’ end
+	
+	-more variation sites
+	
+	-no blast hits on the other chromosomes
+
+2. Good product size
+
+	-KASP: 50 – 250, the shorter, the better
+	
+	-dCAPS: 70 – 350, I usually select 150-200
+
+3. Low Tm difference: the smaller, the better
+
+4. Low hairpin: the smaller, the better
+
+------
+
+For more information, please check: https://github.com/pinbo/SNP_Primer_Pipeline
+  </help>
+
+</tool>

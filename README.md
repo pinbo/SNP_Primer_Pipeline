@@ -4,6 +4,7 @@ These scripts make a simple pipeline to design **KASP** (Kompetitive Allele Spec
 Polymarker (http://polymarker.tgac.ac.uk/) is a great software to design KASP primers, but sometimes I have some specific requirements that Polymarker cannot meet, and it is difficult for me to modify its scripts because I do not know Ruby. That is why I wrote these simple scripts to just meet my requirements.
 
 # Main Changes
+- 03/30/2018 Add a new script getCAPS-with-user-input to use user provided multipe sequences to design CAPS/dCAPS primers and the variations can also be an indel now.
 - 12/20/2017 Renamed the repository from "getKASP_pipeline" to "SNP_Primer_Pipeline"
 - 08/29/2017 Included xml files for used in galaxy
 - 08/29/2017 Added a script for extracting sequences in the reference file.

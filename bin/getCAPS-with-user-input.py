@@ -38,20 +38,84 @@ from glob import glob
 #########################
 ## arguments
 # getCAPS-with-user-input seqfile target-name alleleA alleleB position price
+usage = '''
+Please make sure all the parameters are given.
+
+getCAPS-with-user-input -i seqfile -t target-seq-name --ref Ref_allele --alt Alt_allele -p SNP/indel-position -m max_enzyme_price 
+						--minTm min_Tm --maxTmm max_Tm --minSize min_primer_size --maxSize max_primer_size
+-h or --help: this message
+-i: iseqfile: has all the homeologs for designing genomic specific primers
+-t: target-seq-name: the name of the target sequence
+-p: SNP/indel-position: the postion of the mutation (1 based)
+-m: max_enzyme_price: max enzyme price ($ per 1000 U) (200 for example)
+-r or --ref: Ref_allele: the SNP or indel allele in the seqfile template (treated as reference sequence)
+-a or --alt: Alt_allele: the altanative allele of the SNP or indel
+--mintm <primer min Tm, default 58>
+--maxtm <primer max Tm, default 62>
+--minsize <primer min size, default 18>
+--maxsize <primer max size, default 30>
+
+'''
+
+# parameter or file names that need to be changed
 
 blast = 0 # 0 or 1, whether to blast
+seqfile = ""
+target = ""
+SNP_A = ""
+SNP_B = ""
+snp_pos = 0
+minTm = 58
+maxTm = 62
+minSize = 18
+maxSize = 30
+max_price = 200
 
-seqfile = sys.argv[1]
-target = sys.argv[2]
-SNP_A = sys.argv[3]
-SNP_B = sys.argv[4]
-snp_pos = int(sys.argv[5])
-max_price = int(sys.argv[6])
+try:
+	opts, args = getopt.getopt(sys.argv[1:], "i:p:m:t:r:a:h", ["help", "mintm=", "maxtm=", "minsize=", "maxsize=", "ref=", "alt="])
+except getopt.GetoptError as err:
+	# print help information and exit:
+	print str(err)  # will print something like "option -a not recognized"
+	print usage
+	sys.exit(2)
+for o, a in opts:
+	if o == "-i":
+		seqfile = a
+	elif o in ("-h", "--help"):
+		print usage
+		sys.exit()
+	elif o in ("-p"):
+		snp_pos = int(a)
+	elif o in ("-m"):
+		max_price = int(a)
+	elif o in ("-t"):
+		target = a
+	elif o in ("-r", "--ref"):
+		SNP_A = a
+	elif o in ("-a", "--alt"):
+		SNP_B = a
+	elif o in ("--mintm"):
+		minTm = int(a)
+	elif o in ("--mintm"):
+		minTm = int(a)
+	elif o in ("--maxtm"):
+		maxTm = int(a)
+	elif o in ("--minsize"):
+		minSize = int(a)
+	elif o in ("--maxsize"):
+		maxSize = int(a)
+	else:
+		assert False, "unhandled option"
+print "Options done"
 
-# get all the raw sequences
-#raw = glob("flanking_temp_marker*") # All file names start from "flanking"
-#raw.sort()
+if not target or not seqfile or not SNP_A or not SNP_B or not snp_pos:
+	print usage
+	sys.exit(1)
 
+
+
+
+# code for my reference
 iupac = {"R": "AG", "Y": "TC", "S": "GC", "W": "AT", "K": "TG", "M": "AC"}
 
 
@@ -208,12 +272,12 @@ def ReverseComplement(seq):
 def string_dif(s1, s2): # two strings with equal length
 	return [i for i in xrange(len(s1)) if s1[i] != s2[i]]
 	
-def dif_region(s1, s2): # two strings with equal length
+def dif_region(s1, s2): # two strings do not need to have the same length
 	s1r = s1[::-1] # reverse the string
 	s2r = s2[::-1] # reverse the string
 	L1 = [i for i in xrange(min([len(s1),len(s2)])) if s1[i] != s2[i]] # forward
 	L2 = [i for i in xrange(min([len(s1),len(s2)])) if s1r[i] != s2r[i]] # reverse
-	return [L1[0], len(s1) - L2[0] - 1] # differ positions for forward and reverse on the template
+	return [L1[0], len(s1) - L2[0] - 1] # differ positions for when counting forward and reversely on the template (the two numbers are both in forward direction)
 
 def seq2pattern(seq):
 	iupac = {
@@ -252,9 +316,9 @@ def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match w
 		#if len(re.findall(ss, wild_seq)) != len(re.findall(ss, mut_seq)): # differnt length should be caused by the differnce in the SNP/indel
 		if find_substring(ss, wild_seq) != find_substring(ss, mut_seq): # even they are the same length, if the start position is different, it is still okay
 		#print "Enzyme, Enzyme seq, pattern ", enzyme_name, enzyme_seq, ss
-			for m in re.finditer(ss, wild_seq):
-				#if snp_pos in range(m.start(), m.end()) and not re.search(ss, mut_seq[m.start():m.end()]):
+			for m in re.finditer(ss, wild_seq): # iterate all the matching places
 				change_pos = m.start() + i # which was changed
+				# if the left first different nt between wt and mut is in the enzyme recognization site and the change position is more than 1 nt from it.
 				if pos_L in range(m.start(), m.end()) and pos_L - change_pos > 1:
 					enzyme.primer_direction = "left" # use as left primer end positions
 					enzyme.primer_end_pos += range(change_pos + 1, pos_L)
@@ -264,6 +328,7 @@ def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match w
 					enzyme.template_seq = wild_seq[:change_pos] + enzyme_seq[i].upper() + wild_seq[change_pos+1:]
 					enzyme.change_pos = change_pos
 					print "change position and primer end postions are ", change_pos, enzyme.primer_end_pos
+					# break the loop if one change postion is found, because I do not think we need many
 					break
 				
 				if pos_R in range(m.start(), m.end()) and change_pos - pos_R > 1:
@@ -285,6 +350,7 @@ def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match w
 def find_substring(substring, string): # find all the starting index of a substring
 	return [m.start() for m in re.finditer(substring, string)]
 
+# test whether an enzyme can be modifed to fit a dCAPS
 def test_enzyme(enzyme, wild_seq, mut_seq): # enzyme is an Restriction_Enzyme object
 	enzyme_seq = enzyme.seq
 	enzyme_seq_RC = ReverseComplement(enzyme_seq) # 1
@@ -595,7 +661,10 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 				"PRIMER_PRODUCT_SIZE_RANGE=150-200 200-250 70-150" + "\n" + \
 				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-				"PRIMER_MAX_SIZE=30" + "\n" + \
+				"PRIMER_MAX_SIZE=" + maxSize + "\n" + \
+				"PRIMER_MIN_SIZE=" + minSize  + "\n" + \
+				"PRIMER_MAX_TM=" + maxTm + "\n" + \
+				"PRIMER_MIN_TM=" + minTm + "\n" + \
 				"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
 				"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
 				"PRIMER_LIBERAL_BASE=1" + "\n" + \
@@ -617,7 +686,10 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 			"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 			"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 			"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-			"PRIMER_MAX_SIZE=25" + "\n" + \
+			"PRIMER_MAX_SIZE=" + maxSize + "\n" + \
+			"PRIMER_MIN_SIZE=" + minSize  + "\n" + \
+			"PRIMER_MAX_TM=" + maxTm + "\n" + \
+			"PRIMER_MIN_TM=" + minTm + "\n" + \
 			"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
 			"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
 			"PRIMER_LIBERAL_BASE=1" + "\n" + \
@@ -764,7 +836,10 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 					"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 					"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 					"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-					"PRIMER_MAX_SIZE=30" + "\n" + \
+					"PRIMER_MAX_SIZE=" + maxSize + "\n" + \
+					"PRIMER_MIN_SIZE=" + minSize  + "\n" + \
+					"PRIMER_MAX_TM=" + maxTm + "\n" + \
+					"PRIMER_MIN_TM=" + minTm + "\n" + \
 					"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
 					"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
 					"PRIMER_LIBERAL_BASE=1" + "\n" + \
@@ -791,7 +866,10 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 				"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-				"PRIMER_MAX_SIZE=25" + "\n" + \
+				"PRIMER_MAX_SIZE=" + maxSize + "\n" + \
+				"PRIMER_MIN_SIZE=" + minSize  + "\n" + \
+				"PRIMER_MAX_TM=" + maxTm + "\n" + \
+				"PRIMER_MIN_TM=" + minTm + "\n" + \
 				"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
 				"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
 				"PRIMER_LIBERAL_BASE=1" + "\n" + \
