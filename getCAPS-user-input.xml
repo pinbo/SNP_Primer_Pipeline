@@ -1,6 +1,6 @@
 <tool id="GetCAPSwithUserInput" name="Homeolog Specific dCAPS/CAPS Primer Design for SNP/indels">
   <description>for homeolog sequences in a fasta file</description>
-  <command interpreter="python">bin/getCAPS-with-user-input.py -i $input -t $target -r $ref -a $alt -p $pos -m $max_price --mintm $mintm --maxtm $maxtm --minsize $minsize --maxsize $maxsize
+  <command interpreter="python">bin/getCAPS-with-user-input.py -i $input -t $target -r $ref -a $alt -p $pos -m $max_price --mintm $mintm --maxtm $maxtm --minsize $minsize --maxsize $maxsize</command>
   
   <inputs>
     <param format="fasta" name="input" type="data" label="Homeolog sequences (a fasta file with all the homeolog sequences)"/>
