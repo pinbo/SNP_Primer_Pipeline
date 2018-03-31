@@ -16,8 +16,8 @@
   </inputs>
 
   <outputs>
-      <data format="fasta" name="alignment" from_work_dir="alignment_raw.fa" label="${tool.name} Sequence Alignments"/>
-      <data format="tabular" name="CAPS" from_work_dir="CAPS_output/selected_CAPS_primers.txt" label="${tool.name} CAPS primer output"/>
+      <data format="fasta" name="alignment" from_work_dir="alignment_raw.fa" label="${tool.id} Sequence Alignments"/>
+      <data format="tabular" name="CAPS" from_work_dir="CAPS_output/selected_CAPS_primers.txt" label="${tool.id} CAPS primer output"/>
   </outputs>
 
   <help>
