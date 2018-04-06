@@ -93,7 +93,7 @@ for line in open(blast_file):
 		min_align = max(50, align_length * 0.9) # to filter out those not very good alignment, since I will blast anyway later.
 	# only get min-identity 90% and at least 50 bp alignment
 	#print "snp, min_align", snp, min_align
-	if pct_identity > 90 and align_length > min_align:
+	if pct_identity > 88 and align_length > min_align:
 		qstart, qstop, sstart, sstop = [int(x) for x in fields[6:10]]
 		qseq, sseq = fields[12:14]
 		slen = int(fields[14]) # subject length
