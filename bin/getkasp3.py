@@ -179,7 +179,7 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		if len(seqL) < nL: # in case it does not have enough bases
 			seqL = "-" * (nL - len(seqL)) + seqL
 		if len(seqR) < nR:
-			seqL = seqR + "-" * (nR - len(seqR))
+			seqR = seqR + "-" * (nR - len(seqR))
 		seqk = seqL[::-1][:nL][::-1] + s2[indexL:indexR] + seqR[:nR]
 		print "primer   :", targetSeq.replace("-","")
 		print "seqk     :", seqk
