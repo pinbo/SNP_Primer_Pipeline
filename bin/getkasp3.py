@@ -132,6 +132,31 @@ def FindLongestSubstring(s1, s2):
 	nR = len(s1[longestEnd:].replace("-",""))  # number of bases on the right of the longest segments
 	return [longestStart, longestEnd, nL, nR]
 
+# alignment score
+def score_pairwise(seq1, seq2, gapopen = -3.0, gapext = -1.0, match = 1.0, mismatch = -1.0):
+	score = 0
+	gap = False
+	for i in range(len(seq1)):
+		pair = (seq1[i], seq2[i])
+		if not gap:
+			if '-' in pair:
+				gap = True
+				score += gapopen
+			elif seq1[i] == seq2[i]:
+				score += match
+			else:
+				score += mismatch
+		else:
+			if '-' not in pair:
+				gap = False
+				if seq1[i] == seq2[i]:
+					score += match
+				else:
+					score += mismatch
+			else:
+				score += gapext
+	return score
+
 # get the list of sequences in the homeolog groups for comparison with current primer
 def get_homeo_seq(fasta, target, ids, align_left, align_right):
 	s1 = fasta[target] # primer sequence in the template with gaps
@@ -140,6 +165,7 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		s2 = fasta[k]
 		targetSeq = s1[align_left:(align_right + 1)]
 		homeoSeq = s2[align_left:(align_right + 1)]
+		score1 = score_pairwise(targetSeq, homeoSeq) # score in multiple alignment
 		#print "Targetseq ", targetSeq
 		#print "homeoSeq  ", homeoSeq
 		# Get the sequences for comparison
@@ -155,6 +181,12 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		if len(seqR) < nR:
 			seqL = seqR + "-" * (nR - len(seqR))
 		seqk = seqL[::-1][:nL][::-1] + s2[indexL:indexR] + seqR[:nR]
+		score2 = score_pairwise(targetSeq.replace("-",""), seqk)
+		if score1 > score2:
+			print "homeoSeq but remove all the gaps"
+			print "targetSeq:", targetSeq
+			print "homeoSeq :", homeoSeq
+			seqk = "".join([homeoSeq[i] for i, c in enumerate(targetSeq) if c!='-'])
 		seq2comp.append(seqk)
 		#print k, "\t", seqk
 	return seq2comp
