@@ -180,8 +180,8 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		targetSeq = s1[align_left:(align_right + 1)]
 		homeoSeq = s2[align_left:(align_right + 1)]
 		score1 = score_pairwise(targetSeq, homeoSeq) # score in multiple alignment
-		#print "Targetseq ", targetSeq
-		#print "homeoSeq  ", homeoSeq
+		print "Targetseq ", targetSeq
+		print "homeoSeq  ", homeoSeq
 		# Get the sequences for comparison
 		indexL, indexR, nL, nR = FindLongestSubstring(targetSeq, homeoSeq)
 		indexL += align_left
@@ -195,11 +195,14 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		if len(seqR) < nR:
 			seqL = seqR + "-" * (nR - len(seqR))
 		seqk = seqL[::-1][:nL][::-1] + s2[indexL:indexR] + seqR[:nR]
+		print "seqk     :", seqk
 		score2 = score_pairwise(targetSeq.replace("-",""), seqk)
 		if score1 > score2:
 			print "homeoSeq but remove all the gaps"
 			print "targetSeq:", targetSeq
 			print "homeoSeq :", homeoSeq
+			print "seqk     :", seqk
+			print "primer   :", targetSeq.replace("-","")
 			seqk = "".join([homeoSeq[i] for i, c in enumerate(targetSeq) if c!='-'])
 		seq2comp.append(seqk)
 		#print k, "\t", seqk

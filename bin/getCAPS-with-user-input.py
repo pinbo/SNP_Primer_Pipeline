@@ -277,11 +277,14 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		if len(seqR) < nR:
 			seqL = seqR + "-" * (nR - len(seqR))
 		seqk = seqL[::-1][:nL][::-1] + s2[indexL:indexR] + seqR[:nR]
+		#print "seqk     :", seqk
 		score2 = score_pairwise(targetSeq.replace("-",""), seqk)
 		if score1 > score2:
 			print "homeoSeq but remove all the gaps"
 			print "targetSeq:", targetSeq
 			print "homeoSeq :", homeoSeq
+			print "seqk     :", seqk
+			print "primer   :", targetSeq.replace("-","")
 			seqk = "".join([homeoSeq[i] for i, c in enumerate(targetSeq) if c!='-'])
 		seq2comp.append(seqk)
 		#print k, "\t", seqk
