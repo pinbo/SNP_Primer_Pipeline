@@ -229,7 +229,7 @@ def FindLongestSubstring(s1, s2):
 	return [longestStart, longestEnd, nL, nR]
 
 # alignment score
-def score_pairwise(seq1, seq2, gapopen = -3.0, gapext = -1.0, match = 1.0, mismatch = -1.0):
+def score_pairwise(seq1, seq2, gapopen = -4.0, gapext = -1.0, match = 1.0, mismatch = -1.0):
 	score = 0
 	gap = False
 	for i in range(len(seq1)):
@@ -279,7 +279,11 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		seqk = seqL[::-1][:nL][::-1] + s2[indexL:indexR] + seqR[:nR]
 		#print "seqk     :", seqk
 		score2 = score_pairwise(targetSeq.replace("-",""), seqk)
-		if score1 > score2:
+		ngap_target = targetSeq.count("-") # number of gaps in targetSeq
+		ngap_homeo = homeoSeq.count("-") # number of gaps in homeoSeq
+		# if there are more than 3 gaps, the Tm usually will be 10 C lower than the perfect match
+		# so just use gap shift 
+		if score1 > score2 and max(ngap_target, ngap_homeo) < 4:
 			print "homeoSeq but remove all the gaps"
 			print "targetSeq:", targetSeq
 			print "homeoSeq :", homeoSeq
