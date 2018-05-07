@@ -157,6 +157,15 @@ def score_pairwise(seq1, seq2, gapopen = -4.0, gapext = -1.0, match = 1.0, misma
 				score += gapext
 	return score
 
+# gap differences for an alignment
+def gap_diff(seq1, seq2): # equal length
+	ngap = 0
+	for i in range(len(seq1)):
+		pair = seq1[i] + seq2[i] # "AA", "A-", "-A" or "--"
+		if pair.count("-") == 1:
+			ngap += 1
+	return ngap
+
 # get the list of sequences in the homeolog groups for comparison with current primer
 def get_homeo_seq(fasta, target, ids, align_left, align_right):
 	s1 = fasta[target] # primer sequence in the template with gaps
@@ -184,11 +193,9 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		print "primer   :", targetSeq.replace("-","")
 		print "seqk     :", seqk
 		score2 = score_pairwise(targetSeq.replace("-",""), seqk)
-		ngap_target = targetSeq.count("-") # number of gaps in targetSeq
-		ngap_homeo = homeoSeq.count("-") # number of gaps in homeoSeq
 		# if there are more than 3 gaps, the Tm usually will be 10 C lower than the perfect match
 		# so just use gap shift 
-		if score1 > score2 and max(ngap_target, ngap_homeo) < 4:
+		if score1 > score2 and gap_diff(targetSeq, homeoSeq) < 4:
 			print "homeoSeq but remove all the gaps"
 			print "targetSeq:", targetSeq
 			print "homeoSeq :", homeoSeq
