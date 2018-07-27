@@ -266,7 +266,7 @@ def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match w
 	enzyme_name = enzyme.name
 	enzyme_seq = enzyme.seq
 	for i in range(len(enzyme_seq)):
-		ss = seq2pattern(enzyme_seq[0:i]) + "[atgc]" + seq2pattern(enzyme_seq[i+1:]) # regular expression
+		ss = seq2pattern(enzyme_seq[0:i] + "N" + enzyme_seq[i+1:]) # regular expression
 		#print "Enzyme, Enzyme seq, pattern ", enzyme_name, enzyme_seq, ss
 		for m in re.finditer(ss, wild_seq):
 			if snp_pos in range(m.start(), m.end()) and not re.search(ss, mut_seq[m.start():m.end()]):
