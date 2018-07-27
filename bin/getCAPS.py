@@ -239,6 +239,10 @@ def string_dif(s1, s2): # two strings with equal length
 
 def seq2pattern(seq):
 	iupac = {
+		"A": "A",
+		"T": "T",
+		"G": "G",
+		"C": "C",
 		"B": "[CGT]",
 		"D": "[AGT]",
 		"H": "[ACT]",
@@ -254,13 +258,10 @@ def seq2pattern(seq):
 	seq = seq.upper()
 	seq2 = ""
 	for i in seq:
-		if i in "ATGC":
-			seq2 += i
-		else:
-			seq2 += iupac[i]
-	seq2 = '(?=(' +  seq2 + '))'
+		seq2 += iupac[i]
+	#seq2 = '(?=(' +  seq2 + '))'
 	return seq2.lower()
-
+	
 def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match wild_seq after 1 base change but not mut_seq
 	snp_pos = string_dif(wild_seq, mut_seq)[0] # snp position in the template
 	enzyme_name = enzyme.name
