@@ -67,7 +67,8 @@ def main(args):
 	reference_list = ["/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_v2_ChrU.fa", 
 	"/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_CSS_AB-TGAC_UCW_v1.fa",
 	"/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta",
-	"/Volumes/DATA2/databases/ncbi/nucleotide/Triticum_aestivum.TGACv1.dna.toplevel.fa"]
+	"/Volumes/DATA2/databases/ncbi/nucleotide/Triticum_aestivum.TGACv1.dna.toplevel.fa",
+	"/Users/galaxy/blastdb/IWGSC_v1.1_HC_20170706_cds.fasta"]
 	infile = args[1]
 	outfile = args[2]
 	reference = reference_list[int(args[3]) - 1] # reference 1 or 2
