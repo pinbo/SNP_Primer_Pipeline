@@ -27,7 +27,7 @@
 
 # change the reference location accordingly.
 
-# example: run_getkasp.py for_polymarker.csv 3 200 1 1 1
+# example: run_getkasp.py for_polymarker.csv 3 200 1 1 1 65
 
 #########################
 from glob import glob
@@ -40,6 +40,7 @@ def main(args):
 	caps = int(args[4])
 	kasp = int(args[5])
 	blast = args[6]
+	max_Tm = args[6]
 	script_path = os.path.dirname(os.path.realpath(__file__)) + "/bin/" # scripts folder
 	#reference = "/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_CSS_ABD-TGAC_v1.fa" # blast contig file
 	reference = "/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta"
@@ -71,7 +72,7 @@ def main(args):
 	
 	# step 6: get kasp
 	if kasp:
-		cmd6 = script_path + "getkasp3.py " + blast # add blast option
+		cmd6 = script_path + "getkasp3.py " + blast + " " + max_Tm # add blast option
 		print "Step 6: Get KASP primers for each marker command:\n", cmd6
 		call(cmd6, shell=True)
 	
@@ -87,7 +88,7 @@ def main(args):
 	
 	# step 9: get CAPS markers
 	if caps:
-		cmd9 = script_path + "getCAPS.py " + blast + " " + price # add blast option and price
+		cmd9 = script_path + "getCAPS.py " + blast + " " + price + " " + max_Tm # add blast option and price
 		print "Step 9: Get CAPS and dCAPS primers for each marker command:\n", cmd9
 		call(cmd9, shell=True)
 	

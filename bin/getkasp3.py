@@ -36,6 +36,7 @@ import copy
 #########################
 
 blast = int(sys.argv[1]) # 0 or 1, whether to blast
+max_Tm = sys.argv[2] # max Tm, default 63, can be increased in case high GC region
 # get all the raw sequences
 raw = glob("flanking_temp_marker*") # All file names start from "flanking"
 raw.sort()
@@ -456,6 +457,7 @@ def kasp(seqfile):
 		"PRIMER_PRODUCT_SIZE_RANGE=50-100 100-150" + "\n" + \
 		"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getkasp_path + "/primer3_config/"  + "\n" + \
 		"PRIMER_MAX_SIZE=25" + "\n" + \
+		"PRIMER_MAX_TM=" + max_Tm + "\n" + \
 		"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
 		"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
 		"PRIMER_LIBERAL_BASE=1" + "\n" + \
@@ -619,6 +621,7 @@ def kasp(seqfile):
 			"PRIMER_PRODUCT_SIZE_RANGE=50-250" + "\n" + \
 			"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getkasp_path + "/primer3_config/"  + "\n" + \
 			"PRIMER_MAX_SIZE=25" + "\n" + \
+			"PRIMER_MAX_TM=" + max_Tm + "\n" + \
 			"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
 			"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
 			"PRIMER_LIBERAL_BASE=1" + "\n" + \
