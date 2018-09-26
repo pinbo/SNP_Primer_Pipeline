@@ -457,6 +457,8 @@ def kasp(seqfile):
 		"PRIMER_PRODUCT_SIZE_RANGE=50-100 100-150" + "\n" + \
 		"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getkasp_path + "/primer3_config/"  + "\n" + \
 		"PRIMER_MAX_SIZE=25" + "\n" + \
+		"PRIMER_MIN_TM=57.0" + "\n" + \
+		"PRIMER_OPT_TM=60.0" + "\n" + \
 		"PRIMER_MAX_TM=" + max_Tm + "\n" + \
 		"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
 		"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
@@ -621,6 +623,8 @@ def kasp(seqfile):
 			"PRIMER_PRODUCT_SIZE_RANGE=50-250" + "\n" + \
 			"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getkasp_path + "/primer3_config/"  + "\n" + \
 			"PRIMER_MAX_SIZE=25" + "\n" + \
+			"PRIMER_MIN_TM=57.0" + "\n" + \
+			"PRIMER_OPT_TM=60.0" + "\n" + \
 			"PRIMER_MAX_TM=" + max_Tm + "\n" + \
 			"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
 			"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
