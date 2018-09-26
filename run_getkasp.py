@@ -40,7 +40,7 @@ def main(args):
 	caps = int(args[4])
 	kasp = int(args[5])
 	blast = args[6]
-	max_Tm = args[6]
+	max_Tm = args[7]
 	script_path = os.path.dirname(os.path.realpath(__file__)) + "/bin/" # scripts folder
 	#reference = "/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_CSS_ABD-TGAC_v1.fa" # blast contig file
 	reference = "/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta"
