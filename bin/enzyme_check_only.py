@@ -134,13 +134,21 @@ def ReverseComplement(seq):
 
 def string_dif(s1, s2): # two strings with equal length
 	return [i for i in xrange(len(s1)) if s1[i] != s2[i]]
-	
+
 def dif_region(s1, s2): # two strings do not need to have the same length
 	s1r = s1[::-1] # reverse the string
 	s2r = s2[::-1] # reverse the string
 	L1 = [i for i in xrange(min([len(s1),len(s2)])) if s1[i] != s2[i]] # forward
 	L2 = [i for i in xrange(min([len(s1),len(s2)])) if s1r[i] != s2r[i]] # reverse
 	return [L1[0], len(s1) - L2[0] - 1] # differ positions for when counting forward and reversely on the template (the two numbers are both in forward direction)
+
+# return the range of differences of two strings
+def dif_region2(s1, s2): # two strings do not need to have the same length
+	s1r = s1[::-1] # reverse the string
+	s2r = s2[::-1] # reverse the string
+	L1 = [i for i in xrange(min([len(s1),len(s2)])) if s1[i] != s2[i]] # forward
+	L2 = [i for i in xrange(min([len(s1),len(s2)])) if s1r[i] != s2r[i]] # reverse
+	return [L1[0], -L2[0]]
 
 def seq2pattern(seq):
 	iupac = {
@@ -175,9 +183,6 @@ def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match w
 	enzyme_seq = enzyme.seq.strip("n") # some enzyme has sequence beginning and ending with n, such as TspRI,72, nncastgnn
 	for i in range(len(enzyme_seq)):
 		ss = seq2pattern(enzyme_seq[0:i]) + "[atgc]" + seq2pattern(enzyme_seq[i+1:]) # regular expression
-		#print "find_substring(ss, wild_seq), ", i, find_substring(ss, wild_seq)
-		#print "find_substring(ss, mutt_seq), ", i, find_substring(ss, mut_seq) 
-		#if len(re.findall(ss, wild_seq)) != len(re.findall(ss, mut_seq)): # differnt length should be caused by the differnce in the SNP/indel
 		if find_substring(ss, wild_seq) != find_substring(ss, mut_seq): # even they are the same length, if the start position is different, it is still okay
 		#print "Enzyme, Enzyme seq, pattern ", enzyme_name, enzyme_seq, ss
 			for m in re.finditer(ss, wild_seq): # iterate all the matching places
@@ -291,10 +296,7 @@ def get_fasta2(infile, target_chrom):
 def caps(seqA, seqB, max_price): # two alleles now support indels or long haplotypes, SNP_A is the template allele (or reference allel)
 	snpname = "SNP"
 	getcaps_path = os.path.dirname(os.path.realpath(__file__))
-	directory = "CAPS_output"
-	if not os.path.exists(directory):
-		os.makedirs(directory)
-	out = directory + "/available_enzymes.txt"
+	out = "available_enzymes.txt"
 	print "Output selected CAPS file name is: ", out
 
 	################## Get CAPS information
@@ -304,7 +306,8 @@ def caps(seqA, seqB, max_price): # two alleles now support indels or long haplot
 	# step 2: get the list of enzymes that can be used for caps or dcaps
 	wild_seq = seqA
 	mut_seq = seqB
-	pos_L, pos_R = dif_region(wild_seq, mut_seq) # differnce region borders in the wild_seq, use this instead of snp_pos to decide use as left end or right end 
+	pos_L, pos_R = dif_region2(wild_seq, mut_seq) # differnce region borders in the wild_seq, use this instead of snp_pos to decide use as left end or right end 
+	var = "[" + wild_seq[pos_L:pos_R] + "/" + mut_seq[pos_L:pos_R] + "]" # variations, for examploe "[AT/TAG]"
 	caps_list = []
 	dcaps_list = []
 	for k in REs:
@@ -325,7 +328,9 @@ def caps(seqA, seqB, max_price): # two alleles now support indels or long haplot
 	outfile.write("Sequence B:\t" + seqB + "\n\n")
 	outfile.write("Enzyme\tEnzyme_seq\tChange_pos\tOther_cut_pos\tTemplate\n")
 	for enzyme in dcaps_list + caps_list:
-		outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + enzyme.template_seq + "\n")
+		seq = enzyme.template_seq
+		seq = seq[:pos_L] + var + seq[pos_R:]
+		outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + seq + "\n")
 	# close outfile
 	outfile.close()
 	return 0
