@@ -61,7 +61,7 @@ def main(args):
 	call(cmd3, shell=True)
 	
 	# step 4: split file for each marker
-	cmd4 = "awk  '{ print $2,$3,$4 > \"temp_marker_\"$1.txt }' temp_range.txt"
+	cmd4 = "awk  '{ print $2,$3,$4 > \"temp_marker_\"$1\".txt\" }' temp_range.txt"
 	print "Step 4: Flanking range for each marker command:\n", cmd4
 	call(cmd4, shell=True)
 	
