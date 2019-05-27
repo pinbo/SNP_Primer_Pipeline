@@ -114,7 +114,7 @@ def get_fasta(infile, seq_name_list):
 			if not line:
 				continue
 			if line.startswith(">"):
-				sequence_name = line.split()[0].lstrip(">")
+				sequence_name = line.split(":")[0].lstrip(">")
 				if sequence_name in seq_name_list[n]: # in case seq name mismatch
 					sequence_name = seq_name_list[n]
 					n += 1
