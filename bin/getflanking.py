@@ -135,12 +135,19 @@ for line in open(blast_file):
 		snp_list.append(query)
 		range_list.append("\t".join([subject, str(up) + "-" + str(down), strand]))
 
+# find out which has too many hits
+max_hit = 6
+from collections import Counter
+ct = Counter(snp_list) # count of each snp hits
 
 # output
 out = open(outfile, "w")
 
 for i in range(len(snp_list)):
 	snp = snp_list[i]
+	if ct[snp] > max_hit:
+		print snp, ct[snp]
+		continue
 	rg = range_list[i]
 	out.write(snpinfo[snp] + "\t" + rg + "\n")
 
