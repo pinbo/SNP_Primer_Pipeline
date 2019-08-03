@@ -139,6 +139,8 @@ for line in open(blast_file):
 max_hit = 6
 from collections import Counter
 ct = Counter(snp_list) # count of each snp hits
+for i in ct:
+	print i, "has hits", ct[i]
 
 # output
 out = open(outfile, "w")
@@ -146,7 +148,7 @@ out = open(outfile, "w")
 for i in range(len(snp_list)):
 	snp = snp_list[i]
 	if ct[snp] > max_hit:
-		print snp, ct[snp]
+		#print snp, ct[snp]
 		continue
 	rg = range_list[i]
 	out.write(snpinfo[snp] + "\t" + rg + "\n")
