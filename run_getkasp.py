@@ -51,7 +51,7 @@ def main(args):
 	call(cmd1, shell=True)
 	
 	#step 2: blast
-	cmd2 = 'blastn -task blastn -db ' + reference + ' -query for_blast.fa -outfmt "6 std qseq sseq slen" -num_threads 3 -out blast_out.txt'
+	cmd2 = 'blastn -task blastn -db ' + reference + ' -query for_blast.fa -outfmt "6 std qseq sseq slen" -word_size 11 -num_threads 3 -out blast_out.txt'
 	print "Step 2: Blast command:\n", cmd2
 	call(cmd2, shell=True)
 	
