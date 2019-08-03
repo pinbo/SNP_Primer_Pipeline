@@ -189,8 +189,8 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		targetSeq = s1[align_left:(align_right + 1)]
 		homeoSeq = s2[align_left:(align_right + 1)]
 		score1 = score_pairwise(targetSeq, homeoSeq) # score in multiple alignment
-		print "Targetseq ", targetSeq
-		print "homeoSeq  ", homeoSeq
+		# print "Targetseq ", targetSeq
+		# print "homeoSeq  ", homeoSeq
 		# Get the sequences for comparison
 		indexL, indexR, nL, nR = FindLongestSubstring(targetSeq, homeoSeq)
 		indexL += align_left
@@ -204,16 +204,16 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		if len(seqR) < nR:
 			seqR = seqR + "-" * (nR - len(seqR))
 		seqk = seqL[::-1][:nL][::-1] + s2[indexL:indexR] + seqR[:nR]
-		print "seqk     :", seqk
+		#print "seqk     :", seqk
 		score2 = score_pairwise(targetSeq.replace("-",""), seqk)
 		# if there are more than 3 gaps, the Tm usually will be 10 C lower than the perfect match
 		# so just use gap shift 
 		if score1 > score2 and gap_diff(targetSeq, homeoSeq) < 4:
-			print "homeoSeq but remove all the gaps"
-			print "targetSeq:", targetSeq
-			print "homeoSeq :", homeoSeq
-			print "seqk     :", seqk
-			print "primer   :", targetSeq.replace("-","")
+			# print "homeoSeq but remove all the gaps"
+			# print "targetSeq:", targetSeq
+			# print "homeoSeq :", homeoSeq
+			# print "seqk     :", seqk
+			# print "primer   :", targetSeq.replace("-","")
 			seqk = "".join([homeoSeq[i] for i, c in enumerate(targetSeq) if c!='-'])
 		seq2comp.append(seqk)
 		#print k, "\t", seqk
@@ -282,7 +282,7 @@ def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match w
 						enzyme.primer_end_pos = range(change_pos + 1, snp_pos) # a list of primer end positions
 					else:
 						enzyme.primer_end_pos = range(snp_pos + 1, change_pos) # a list of primer end positions
-					print "change position and primer end postions are ", change_pos, enzyme.primer_end_pos
+					#print "change position and primer end postions are ", change_pos, enzyme.primer_end_pos
 					break
 		# break the loop if dcaps found
 		if enzyme.dcaps == "Yes":

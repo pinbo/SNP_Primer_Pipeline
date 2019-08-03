@@ -176,8 +176,8 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		targetSeq = s1[align_left:(align_right + 1)]
 		homeoSeq = s2[align_left:(align_right + 1)]
 		score1 = score_pairwise(targetSeq, homeoSeq) # score in multiple alignment
-		print "Targetseq ", targetSeq
-		print "homeoSeq  ", homeoSeq
+		#print "Targetseq ", targetSeq
+		#print "homeoSeq  ", homeoSeq
 		# Get the sequences for comparison
 		indexL, indexR, nL, nR = FindLongestSubstring(targetSeq, homeoSeq)
 		indexL += align_left
@@ -191,17 +191,17 @@ def get_homeo_seq(fasta, target, ids, align_left, align_right):
 		if len(seqR) < nR:
 			seqR = seqR + "-" * (nR - len(seqR))
 		seqk = seqL[::-1][:nL][::-1] + s2[indexL:indexR] + seqR[:nR]
-		print "primer   :", targetSeq.replace("-","")
-		print "seqk     :", seqk
+		#print "primer   :", targetSeq.replace("-","")
+		#print "seqk     :", seqk
 		score2 = score_pairwise(targetSeq.replace("-",""), seqk)
 		# if there are more than 3 gaps, the Tm usually will be 10 C lower than the perfect match
 		# so just use gap shift 
 		if score1 > score2 and gap_diff(targetSeq, homeoSeq) < 4:
-			print "homeoSeq but remove all the gaps"
-			print "targetSeq:", targetSeq
-			print "homeoSeq :", homeoSeq
-			print "seqk     :", seqk
-			print "primer   :", targetSeq.replace("-","")
+			# print "homeoSeq but remove all the gaps"
+			# print "targetSeq:", targetSeq
+			# print "homeoSeq :", homeoSeq
+			# print "seqk     :", seqk
+			# print "primer   :", targetSeq.replace("-","")
 			seqk = "".join([homeoSeq[i] for i, c in enumerate(targetSeq) if c!='-'])
 		seq2comp.append(seqk)
 		#print k, "\t", seqk
@@ -420,7 +420,7 @@ def kasp(seqfile):
 	product_max = 250
 	alt_allele = iupac[allele][0] # choose A or T
 	SNP_A, SNP_B = iupac[allele] # SNP 2 alleles
-	print "SNP_A, SNP_B ", SNP_A, SNP_B
+	#print "SNP_A, SNP_B ", SNP_A, SNP_B
 	# software path
 	primer3_path, muscle_path = get_software_path(getkasp_path)
 	
