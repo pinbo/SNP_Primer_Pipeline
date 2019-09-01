@@ -37,6 +37,8 @@ from glob import glob
 blast = int(sys.argv[1]) # 0 or 1, whether to blast
 max_price = int(sys.argv[2])
 max_Tm = sys.argv[3] # max Tm, default 63, can be increased in case high GC region
+max_size = sys.argv[4] # max primer size, default 25, can be increased in case low GC region
+
 # get all the raw sequences
 raw = glob("flanking_temp_marker*") # All file names start from "flanking"
 raw.sort()
@@ -602,7 +604,7 @@ def caps(seqfile):
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 				"PRIMER_PRODUCT_SIZE_RANGE=150-200 200-250 70-150" + "\n" + \
 				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-				"PRIMER_MAX_SIZE=25" + "\n" + \
+				"PRIMER_MAX_SIZE=" + max_size + "\n" + \
 				"PRIMER_MIN_TM=57.0" + "\n" + \
 				"PRIMER_OPT_TM=60.0" + "\n" + \
 				"PRIMER_MAX_TM=" + max_Tm + "\n" + \
@@ -627,7 +629,7 @@ def caps(seqfile):
 			"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 			"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 			"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-			"PRIMER_MAX_SIZE=25" + "\n" + \
+			"PRIMER_MAX_SIZE=" + max_size + "\n" + \
 			"PRIMER_MIN_TM=57.0" + "\n" + \
 			"PRIMER_OPT_TM=60.0" + "\n" + \
 			"PRIMER_MAX_TM=" + max_Tm + "\n" + \
@@ -776,7 +778,7 @@ def caps(seqfile):
 					"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 					"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 					"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-					"PRIMER_MAX_SIZE=25" + "\n" + \
+					"PRIMER_MAX_SIZE=" + max_size + "\n" + \
 					"PRIMER_MIN_TM=57.0" + "\n" + \
 					"PRIMER_OPT_TM=60.0" + "\n" + \
 					"PRIMER_MAX_TM=" + max_Tm + "\n" + \
@@ -806,7 +808,7 @@ def caps(seqfile):
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 				"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-				"PRIMER_MAX_SIZE=25" + "\n" + \
+				"PRIMER_MAX_SIZE=" + max_size + "\n" + \
 				"PRIMER_MIN_TM=57.0" + "\n" + \
 				"PRIMER_OPT_TM=60.0" + "\n" + \
 				"PRIMER_MAX_TM=" + max_Tm + "\n" + \
