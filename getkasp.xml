@@ -6,7 +6,7 @@
     <param name="ploidy" size="4" type="integer" value="3" label="Ploidy" help="A genome, AB genome, or ABD genome"/>
     <param name="price" size="4" type="integer" value="200" label="Maximum NEB restriction enzyme price (dollars per 1000 U)"/>
     <param name="maxTm" size="100" type="text" value="63.0" label="Maximum Primer Tm"/>
-    <param name="maxSize" size="100" type="text" value="25" label="Maximum Primer Size"/>
+    <param name="maxSize" size="100" type="text" value="25" label="Maximum Primer Size (<= 36)"/>
     <param name="CAPS" type="select" label="Design CAPS/dCAPS primers?" help="If yes, CAPS/dCAPS primers will be designed.">
         <option value="1">Yes</option>
         <option value="0">No</option>
