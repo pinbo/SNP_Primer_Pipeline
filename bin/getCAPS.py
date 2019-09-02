@@ -282,7 +282,7 @@ def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match w
 					print "One nt can be changed to fit enzyme", enzyme.name
 					enzyme.dcaps = "Yes"
 					enzyme.template_seq = wild_seq[:change_pos] + enzyme_seq[i].upper() + wild_seq[change_pos+1:]
-					enzyme.change_pos = change_pos
+					enzyme.change_pos = change_pos + 1 # 1 based
 					enzyme.potential_primer = enzyme.template_seq[(snp_pos - 20):snp_pos] + "[" + SNP_A + "/" + SNP_B + "]" + enzyme.template_seq[(snp_pos + 1):(snp_pos + 21)]  # show changed sequences
 					if change_pos < snp_pos:
 						enzyme.primer_end_pos = range(change_pos + 1, snp_pos) # a list of primer end positions
@@ -661,7 +661,7 @@ def caps(seqfile):
 				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
 			outfile.write("\ndCAPS cut information for SNP " + snpname + "\n") # change to 1 based
 			for enzyme in dcaps_list:
-				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos + 1) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + enzyme.potential_primer + "\n")
+				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + enzyme.potential_primer + "\n")
 			outfile.close()
 			return 0
 		# primer3 output file
@@ -842,7 +842,7 @@ def caps(seqfile):
 				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
 			outfile.write("\ndCAPS cut information for SNP " + snpname + "\n") # change to 1 based
 			for enzyme in dcaps_list:
-				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos + 1) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + enzyme.potential_primer + "\n")
+				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + enzyme.potential_primer + "\n")
 			outfile.close()
 			return 0
 		# primer3 output file
@@ -910,7 +910,7 @@ def caps(seqfile):
 	outfile.write("\n\nCAPS cut information for snp " + snpname + "\n") # change to 1 based
 	outfile.write("Enzyme\tEnzyme_seq\tChange_pos\tOther_cut_pos\tChanged_sequence\n")
 	for enzyme in dcaps_list + caps_list:
-		outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos + 1) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + enzyme.potential_primer + "\n")
+		outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + enzyme.potential_primer + "\n")
 	# close outfile
 	outfile.write("\n\n\n")
 	outfile.close()
