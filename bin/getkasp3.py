@@ -413,6 +413,7 @@ def kasp(seqfile):
 	chrom = chrom[0:2] # no arm
 	snp_site = int(pos) - 1 # 0-based
 	getkasp_path = os.path.dirname(os.path.realpath(__file__))
+	global_setting_file = getkasp_path + "/global_settings.txt"
 	directory = "KASP_output"
 	if not os.path.exists(directory):
 		os.makedirs(directory)
@@ -482,7 +483,7 @@ def kasp(seqfile):
 		p3input.close()
 		# primer3 output file
 		primer3output = directory + "/primer3.output." + snpname
-		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " " + primer3input
+		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " --p3_settings_file=" + global_setting_file + " " + primer3input
 		print "Primer3 command 1st time: ", p3cmd
 		call(p3cmd, shell=True)
 		primerpairs = parse_primer3output(primer3output, 5)
@@ -642,7 +643,7 @@ def kasp(seqfile):
 
 		# primer3 output file
 		primer3output = directory + "/primer3.output." + snpname
-		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " " + primer3input
+		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " --p3_settings_file=" + global_setting_file + " " + primer3input
 		print "Primer3 command 1st time: ", p3cmd
 		call(p3cmd, shell=True)
 		primerpairs = parse_primer3output(primer3output, 1)

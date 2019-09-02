@@ -530,6 +530,7 @@ def caps(seqfile):
 	snp_pos = int(pos) - 1 # 0-based
 	print "snpname, chrom, allele, pos ", snpname, chrom, allele, pos
 	getcaps_path = os.path.dirname(os.path.realpath(__file__))
+	global_setting_file = getkasp_path + "/global_settings.txt"
 	directory = "CAPS_output"
 	if not os.path.exists(directory):
 		os.makedirs(directory)
@@ -661,7 +662,7 @@ def caps(seqfile):
 			return 0
 		# primer3 output file
 		primer3output = directory + "/primer3.output." + snpname
-		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " " + primer3input
+		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " --p3_settings_file=" + global_setting_file + " " + primer3input
 		print "Primer3 command 1st time: ", p3cmd
 		call(p3cmd, shell=True)
 		primerpairs = parse_primer3output(primer3output, 5)
@@ -842,7 +843,7 @@ def caps(seqfile):
 			return 0
 		# primer3 output file
 		primer3output = directory + "/primer3.output." + snpname
-		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " " + primer3input
+		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " --p3_settings_file=" + global_setting_file + " " + primer3input
 		print "Primer3 command 1st time: ", p3cmd
 		call(p3cmd, shell=True)
 
