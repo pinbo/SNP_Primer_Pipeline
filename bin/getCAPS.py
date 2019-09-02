@@ -270,6 +270,8 @@ def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match w
 	snp_pos = string_dif(wild_seq, mut_seq)[0] # snp position in the template
 	enzyme_name = enzyme.name
 	enzyme_seq = enzyme.seq
+	SNP_A = wild_seq[snp_pos]
+	SNP_B = ut_seq[snp_pos]
 	for i in range(len(enzyme_seq)):
 		ss = seq2pattern(enzyme_seq[0:i] + "N" + enzyme_seq[i+1:]) # regular expression
 		#print "Enzyme, Enzyme seq, pattern ", enzyme_name, enzyme_seq, ss
@@ -281,12 +283,11 @@ def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match w
 					enzyme.dcaps = "Yes"
 					enzyme.template_seq = wild_seq[:change_pos] + enzyme_seq[i].upper() + wild_seq[change_pos+1:]
 					enzyme.change_pos = change_pos
+					enzyme.potential_primer = enzyme.template_seq[(snp_pos - 20):snp_pos] + "[" + SNP_A + "/" + SNP_B + "]" + enzyme.template_seq[(snp_pos + 1):(snp_pos + 21)]  # show changed sequences
 					if change_pos < snp_pos:
 						enzyme.primer_end_pos = range(change_pos + 1, snp_pos) # a list of primer end positions
-						enzyme.potential_primer = enzyme.template_seq[(snp_pos - 20):snp_pos] # show a 20bp potential primers
 					else:
 						enzyme.primer_end_pos = range(snp_pos + 1, change_pos) # a list of primer end positions
-						enzyme.potential_primer = enzyme.template_seq[(snp_pos + 1):(snp_pos + 21)]
 					#print "change position and primer end postions are ", change_pos, enzyme.primer_end_pos
 					break
 		# break the loop if dcaps found
@@ -660,7 +661,7 @@ def caps(seqfile):
 				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
 			outfile.write("\ndCAPS cut information for SNP " + snpname + "\n") # change to 1 based
 			for enzyme in dcaps_list:
-				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + enzyme.potential_primer + "\n")
+				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos + 1) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + enzyme.potential_primer + "\n")
 			outfile.close()
 			return 0
 		# primer3 output file
@@ -836,12 +837,12 @@ def caps(seqfile):
 			outfile.write("Sites that can differ all for " + snpname + "\n")
 			outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
 			outfile.write("\nCAPS cut information for SNP " + snpname + "\n") # change to 1 based
-			outfile.write("Enzyme\tEnzyme_seq\tChange_pos\tOther_cut_pos\tPotential_Primer\n")
+			outfile.write("Enzyme\tEnzyme_seq\tChange_pos\tOther_cut_pos\tChanged_sequence\n")
 			for enzyme in caps_list:
 				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\n")
 			outfile.write("\ndCAPS cut information for SNP " + snpname + "\n") # change to 1 based
 			for enzyme in dcaps_list:
-				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + enzyme.potential_primer + "\n")
+				outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos + 1) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + enzyme.potential_primer + "\n")
 			outfile.close()
 			return 0
 		# primer3 output file
@@ -907,9 +908,9 @@ def caps(seqfile):
 	outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
 	# write CAPS cut information
 	outfile.write("\n\nCAPS cut information for snp " + snpname + "\n") # change to 1 based
-	outfile.write("Enzyme\tEnzyme_seq\tChange_pos\tOther_cut_pos\tPotential_Primer\n")
+	outfile.write("Enzyme\tEnzyme_seq\tChange_pos\tOther_cut_pos\tChanged_sequence\n")
 	for enzyme in dcaps_list + caps_list:
-		outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + enzyme.potential_primer + "\n")
+		outfile.write(enzyme.name + "\t" + enzyme.seq + "\t" + str(enzyme.change_pos + 1) + "\t" + ", ".join([str(x + 1) for x in enzyme.allpos]) + "\t" + enzyme.potential_primer + "\n")
 	# close outfile
 	outfile.write("\n\n\n")
 	outfile.close()
