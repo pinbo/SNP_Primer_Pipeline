@@ -530,7 +530,7 @@ def caps(seqfile):
 	snp_pos = int(pos) - 1 # 0-based
 	print "snpname, chrom, allele, pos ", snpname, chrom, allele, pos
 	getcaps_path = os.path.dirname(os.path.realpath(__file__))
-	global_setting_file = getkasp_path + "/global_settings.txt"
+	global_setting_file = getcaps_path + "/global_settings.txt"
 	directory = "CAPS_output"
 	if not os.path.exists(directory):
 		os.makedirs(directory)
