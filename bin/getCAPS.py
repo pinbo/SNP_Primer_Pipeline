@@ -38,6 +38,19 @@ blast = int(sys.argv[1]) # 0 or 1, whether to blast
 max_price = int(sys.argv[2])
 max_Tm = sys.argv[3] # max Tm, default 63, can be increased in case high GC region
 max_size = sys.argv[4] # max primer size, default 25, can be increased in case low GC region
+pick_anyway = sys.argv[5] # pick primer anyway even if it violates specific constrains
+
+common_settings = "PRIMER_TASK=generic" + "\n" + \
+				"PRIMER_MAX_SIZE=" + max_size + "\n" + \
+				"PRIMER_MIN_TM=57.0" + "\n" + \
+				"PRIMER_OPT_TM=60.0" + "\n" + \
+				"PRIMER_MAX_TM=" + max_Tm + "\n" + \
+				"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
+				"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
+				"PRIMER_LIBERAL_BASE=1" + "\n" + \
+				"PRIMER_NUM_RETURN=5"  + "\n" + \
+				"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
+				"PRIMER_PICK_ANYWAY=" + pick_anyway + "\n"
 
 # get all the raw sequences
 raw = glob("flanking_temp_marker*") # All file names start from "flanking"
@@ -604,20 +617,11 @@ def caps(seqfile):
 					right_end = -1000000
 				#if right_end - left_end < product_min - 35 or right_end - left_end > product_max - 35: # suppose both primers are 18 bp
 				#	continue
-				settings = "PRIMER_TASK=generic" + "\n" + \
+				settings = common_settings + \
 				"SEQUENCE_ID=" + snpname + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(primer_end_pos+1) + "\n" + \
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 				"PRIMER_PRODUCT_SIZE_RANGE=150-200 200-250 70-150" + "\n" + \
 				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-				"PRIMER_MAX_SIZE=" + max_size + "\n" + \
-				"PRIMER_MIN_TM=57.0" + "\n" + \
-				"PRIMER_OPT_TM=60.0" + "\n" + \
-				"PRIMER_MAX_TM=" + max_Tm + "\n" + \
-				"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
-				"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
-				"PRIMER_LIBERAL_BASE=1" + "\n" + \
-				"PRIMER_NUM_RETURN=5"  + "\n" + \
-				"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
 				"SEQUENCE_FORCE_LEFT_END=" + str(left_end) + "\n" + \
 				"SEQUENCE_FORCE_RIGHT_END=" + str(right_end) + "\n" + \
 				"="
@@ -629,20 +633,11 @@ def caps(seqfile):
 		left_end = -1000000
 		right_end = -1000000
 		for enzyme in caps_list:
-			settings = "PRIMER_TASK=generic" + "\n" + \
+			settings = common_settings + \
 			"SEQUENCE_ID=" + snpname + "-CAPS-" + enzyme.name + "-" + enzyme.seq  + "\n" + \
 			"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 			"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 			"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-			"PRIMER_MAX_SIZE=" + max_size + "\n" + \
-			"PRIMER_MIN_TM=57.0" + "\n" + \
-			"PRIMER_OPT_TM=60.0" + "\n" + \
-			"PRIMER_MAX_TM=" + max_Tm + "\n" + \
-			"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
-			"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
-			"PRIMER_LIBERAL_BASE=1" + "\n" + \
-			"PRIMER_NUM_RETURN=5"  + "\n" + \
-			"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
 			"SEQUENCE_FORCE_LEFT_END=" + str(left_end) + "\n" + \
 			"SEQUENCE_FORCE_RIGHT_END=" + str(right_end) + "\n" + \
 			"SEQUENCE_TARGET=" + str(snp_pos - 20) + ",40" + "\n" + \
@@ -778,20 +773,11 @@ def caps(seqfile):
 						right_end = i + 1
 					if right_end - left_end < product_min - 35 or right_end - left_end > product_max - 35: # suppose both primers are 18 bp
 						continue
-					settings = "PRIMER_TASK=generic" + "\n" + \
+					settings = common_settings + \
 					"SEQUENCE_ID=" + snpname + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i+1) + "-" + str(primer_end_pos+1) + "\n" + \
 					"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 					"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 					"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-					"PRIMER_MAX_SIZE=" + max_size + "\n" + \
-					"PRIMER_MIN_TM=57.0" + "\n" + \
-					"PRIMER_OPT_TM=60.0" + "\n" + \
-					"PRIMER_MAX_TM=" + max_Tm + "\n" + \
-					"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
-					"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
-					"PRIMER_LIBERAL_BASE=1" + "\n" + \
-					"PRIMER_NUM_RETURN=5"  + "\n" + \
-					"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
 					"SEQUENCE_FORCE_LEFT_END=" + str(left_end) + "\n" + \
 					"SEQUENCE_FORCE_RIGHT_END=" + str(right_end) + "\n" + \
 					"="
@@ -808,20 +794,11 @@ def caps(seqfile):
 				else:
 					left_end = -1000000
 					right_end = i + 1
-				settings = "PRIMER_TASK=generic" + "\n" + \
+				settings = common_settings + \
 				"SEQUENCE_ID=" + snpname + "-CAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i+1) + "\n" + \
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 				"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-				"PRIMER_MAX_SIZE=" + max_size + "\n" + \
-				"PRIMER_MIN_TM=57.0" + "\n" + \
-				"PRIMER_OPT_TM=60.0" + "\n" + \
-				"PRIMER_MAX_TM=" + max_Tm + "\n" + \
-				"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
-				"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
-				"PRIMER_LIBERAL_BASE=1" + "\n" + \
-				"PRIMER_NUM_RETURN=5"  + "\n" + \
-				"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
 				"SEQUENCE_FORCE_LEFT_END=" + str(left_end) + "\n" + \
 				"SEQUENCE_FORCE_RIGHT_END=" + str(right_end) + "\n" + \
 				"SEQUENCE_TARGET=" + str(snp_pos - 20) + ",40" + "\n" + \
