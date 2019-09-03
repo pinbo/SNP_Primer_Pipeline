@@ -38,6 +38,7 @@ import copy
 blast = int(sys.argv[1]) # 0 or 1, whether to blast
 max_Tm = sys.argv[2] # max Tm, default 63, can be increased in case high GC region
 max_size = sys.argv[3] # max primer size, default 25, can be increased in case low GC region
+pick_anyway = sys.argv[4] # pick primer anyway even if it violates specific constrains
 
 # get all the raw sequences
 raw = glob("flanking_temp_marker*") # All file names start from "flanking"
@@ -457,7 +458,7 @@ def kasp(seqfile):
 			seq_template = seq_template[:snp_site] +  alt_allele + seq_template[snp_site + 1:]
 		settings_common = "PRIMER_TASK=generic" + "\n" + \
 		"SEQUENCE_TEMPLATE=" + seq_template + "\n" + \
-		"PRIMER_PRODUCT_SIZE_RANGE=50-100 100-150" + "\n" + \
+		"PRIMER_PRODUCT_SIZE_RANGE=50-100 100-150 150-250" + "\n" + \
 		"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getkasp_path + "/primer3_config/"  + "\n" + \
 		"PRIMER_MAX_SIZE=" + max_size + "\n" + \
 		"PRIMER_MIN_TM=57.0" + "\n" + \
@@ -467,7 +468,8 @@ def kasp(seqfile):
 		"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
 		"PRIMER_LIBERAL_BASE=1" + "\n" + \
 		"PRIMER_NUM_RETURN=5"  + "\n" + \
-		"PRIMER_EXPLAIN_FLAG=1"  + "\n"
+		"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
+		"PRIMER_PICK_ANYWAY=" + pick_anyway + "\n"
 		
 		settings = settings_common + \
 		"SEQUENCE_ID=" + snpname + "-left\n" + \
@@ -620,20 +622,8 @@ def kasp(seqfile):
 				right_end = i
 			if right_end - left_end > product_max - 35: # suppose both primers are 18 bp
 				continue
-			settings = "PRIMER_TASK=generic" + "\n" + \
+			settings = settings_common + \
 			"SEQUENCE_ID=" + snpname + "-" + str(i+1) + "\n" + \
-			"SEQUENCE_TEMPLATE=" + seq_template + "\n" + \
-			"PRIMER_PRODUCT_SIZE_RANGE=50-250" + "\n" + \
-			"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getkasp_path + "/primer3_config/"  + "\n" + \
-			"PRIMER_MAX_SIZE=" + max_size + "\n" + \
-			"PRIMER_MIN_TM=57.0" + "\n" + \
-			"PRIMER_OPT_TM=60.0" + "\n" + \
-			"PRIMER_MAX_TM=" + max_Tm + "\n" + \
-			"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
-			"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
-			"PRIMER_LIBERAL_BASE=1" + "\n" + \
-			"PRIMER_NUM_RETURN=5"  + "\n" + \
-			"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
 			"SEQUENCE_FORCE_LEFT_END=" + str(left_end + 1) + "\n" + \
 			"SEQUENCE_FORCE_RIGHT_END=" + str(right_end + 1) + "\n" + \
 			"="

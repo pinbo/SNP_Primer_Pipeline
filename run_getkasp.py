@@ -42,6 +42,7 @@ def main(args):
 	blast = args[6]
 	max_Tm = args[7]
 	max_size = args[8]
+	pick_anyway = args[9] # pick primer anyway even if it violates specific constrains
 	
 	script_path = os.path.dirname(os.path.realpath(__file__)) + "/bin/" # scripts folder
 	#reference = "/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_CSS_ABD-TGAC_v1.fa" # blast contig file
@@ -74,7 +75,7 @@ def main(args):
 	
 	# step 6: get kasp
 	if kasp:
-		cmd6 = script_path + "getkasp3.py " + blast + " " + max_Tm + " " + max_size # add blast option
+		cmd6 = script_path + "getkasp3.py " + blast + " " + max_Tm + " " + max_size + " " + pick_anyway # add blast option
 		print "Step 6: Get KASP primers for each marker command:\n", cmd6
 		call(cmd6, shell=True)
 	
@@ -90,7 +91,7 @@ def main(args):
 	
 	# step 9: get CAPS markers
 	if caps:
-		cmd9 = script_path + "getCAPS.py " + blast + " " + price + " " + max_Tm + " " + max_size # add blast option and price
+		cmd9 = script_path + "getCAPS.py " + blast + " " + price + " " + max_Tm + " " + max_size + " " + pick_anyway # add blast option and price
 		print "Step 9: Get CAPS and dCAPS primers for each marker command:\n", cmd9
 		call(cmd9, shell=True)
 	
