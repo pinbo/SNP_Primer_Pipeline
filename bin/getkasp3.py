@@ -446,17 +446,7 @@ def kasp(seqfile):
 	alignmentcmd = muscle_path + " -in " + seqfile2 + " -out " + RawAlignFile + " -quiet"
 	print "Alignment command: ", alignmentcmd
 	call(alignmentcmd, shell=True)
-	
-	###############################
-	if not len(ids): # if there is no homeologs found, such as when ploidy is 1
-		# loop to write primer3 input for each variation site
-		# primer3 inputfile
-		primer3input = directory + "/primer3.input." + snpname
-		p3input = open(primer3input, 'w')
-		# because A and T give lower Tm, so use them as template
-		if alt_allele in "ATat":
-			seq_template = seq_template[:snp_site] +  alt_allele + seq_template[snp_site + 1:]
-		settings_common = "PRIMER_TASK=generic" + "\n" + \
+	settings_common = "PRIMER_TASK=generic" + "\n" + \
 		"SEQUENCE_TEMPLATE=" + seq_template + "\n" + \
 		"PRIMER_PRODUCT_SIZE_RANGE=50-100 100-150 150-250" + "\n" + \
 		"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getkasp_path + "/primer3_config/"  + "\n" + \
@@ -470,6 +460,16 @@ def kasp(seqfile):
 		"PRIMER_NUM_RETURN=5"  + "\n" + \
 		"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
 		"PRIMER_PICK_ANYWAY=" + pick_anyway + "\n"
+
+	###############################
+	if not len(ids): # if there is no homeologs found, such as when ploidy is 1
+		# loop to write primer3 input for each variation site
+		# primer3 inputfile
+		primer3input = directory + "/primer3.input." + snpname
+		p3input = open(primer3input, 'w')
+		# because A and T give lower Tm, so use them as template
+		if alt_allele in "ATat":
+			seq_template = seq_template[:snp_site] +  alt_allele + seq_template[snp_site + 1:]
 		
 		settings = settings_common + \
 		"SEQUENCE_ID=" + snpname + "-left\n" + \
