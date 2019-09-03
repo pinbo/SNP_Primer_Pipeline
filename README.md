@@ -5,6 +5,7 @@ Polymarker (http://polymarker.tgac.ac.uk/) is a great software to design KASP pr
 
 # Main Changes
 
+- 09/02/2019: add "PRIMER\_PICK\_ANYWAY" option for the situation when no primers wer obtained.
 - 09/01/2019: add a primer3 global setting file for easy change some parameters.
 - 09/01/2019: add maximum primer length parameter for low GC content region
 - 08/02/2019: add a maximum hits filter: if more than 6 hits, do not design for this SNP, because some SNPs have too many hits.
