@@ -738,27 +738,27 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 		product_max = 900
 		left_end = -1000000
 		right_end = -1000000
-		for enzyme in caps_list:
-			settings = "PRIMER_TASK=generic" + "\n" + \
-			"SEQUENCE_ID=" + snpname + "-CAPS-" + enzyme.name + "-" + enzyme.seq  + "\n" + \
-			"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
-			"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
-			"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-			"PRIMER_MAX_SIZE=" + str(maxSize) + "\n" + \
-			"PRIMER_MIN_SIZE=" + str(minSize)  + "\n" + \
-			"PRIMER_MAX_TM=" + str(maxTm) + "\n" + \
-			"PRIMER_MIN_TM=" + str(minTm) + "\n" + \
-			"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
-			"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
-			"PRIMER_LIBERAL_BASE=1" + "\n" + \
-			"PRIMER_NUM_RETURN=5"  + "\n" + \
-			"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
-			"SEQUENCE_FORCE_LEFT_END=" + str(left_end) + "\n" + \
-			"SEQUENCE_FORCE_RIGHT_END=" + str(right_end) + "\n" + \
-			"SEQUENCE_TARGET=" + str(snp_pos - 20) + ",40" + "\n" + \
-			"="
-			n += 1
-			p3input.write(settings + "\n")
+		#for enzyme in caps_list:
+		settings = "PRIMER_TASK=generic" + "\n" + \
+		"SEQUENCE_ID=" + snpname + "-CAPS-" + "\n" + \
+		"SEQUENCE_TEMPLATE=" + wild_seq + "\n" + \
+		"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
+		"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
+		"PRIMER_MAX_SIZE=" + str(maxSize) + "\n" + \
+		"PRIMER_MIN_SIZE=" + str(minSize)  + "\n" + \
+		"PRIMER_MAX_TM=" + str(maxTm) + "\n" + \
+		"PRIMER_MIN_TM=" + str(minTm) + "\n" + \
+		"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
+		"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
+		"PRIMER_LIBERAL_BASE=1" + "\n" + \
+		"PRIMER_NUM_RETURN=5"  + "\n" + \
+		"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
+		"SEQUENCE_FORCE_LEFT_END=" + str(left_end) + "\n" + \
+		"SEQUENCE_FORCE_RIGHT_END=" + str(right_end) + "\n" + \
+		"SEQUENCE_TARGET=" + str(snp_pos - 20) + ",40" + "\n" + \
+		"="
+		n += 1
+		p3input.write(settings + "\n")
 
 		p3input.close()
 		
@@ -911,34 +911,36 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 		# for caps
 		product_min = 300
 		product_max = 900
-		for enzyme in caps_list:
-			for i in variation: # sites that can differ all
-				if i < snp_pos:
-					left_end = i + 1
-					right_end = -1000000
-				else:
-					left_end = -1000000
-					right_end = i + 1
-				settings = "PRIMER_TASK=generic" + "\n" + \
-				"SEQUENCE_ID=" + snpname + "-CAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(i+1) + "\n" + \
-				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
-				"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
-				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
-				"PRIMER_MAX_SIZE=" + str(maxSize) + "\n" + \
-				"PRIMER_MIN_SIZE=" + str(minSize)  + "\n" + \
-				"PRIMER_MAX_TM=" + str(maxTm) + "\n" + \
-				"PRIMER_MIN_TM=" + str(minTm) + "\n" + \
-				"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
-				"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
-				"PRIMER_LIBERAL_BASE=1" + "\n" + \
-				"PRIMER_NUM_RETURN=5"  + "\n" + \
-				"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
-				"SEQUENCE_FORCE_LEFT_END=" + str(left_end) + "\n" + \
-				"SEQUENCE_FORCE_RIGHT_END=" + str(right_end) + "\n" + \
-				"SEQUENCE_TARGET=" + str(snp_pos - 20) + ",40" + "\n" + \
-				"="
-				n += 1
-				p3input.write(settings + "\n")	
+		# since indels already has at least 1 bp differnce, so I will always design primers flanking the indel
+		# if the indel is > 2 bp, I can directly use PAGE to separate the bands
+		#for enzyme in caps_list:
+		for i in variation: # sites that can differ all
+			if i < snp_pos:
+				left_end = i + 1
+				right_end = -1000000
+			else:
+				left_end = -1000000
+				right_end = i + 1
+			settings = "PRIMER_TASK=generic" + "\n" + \
+			"SEQUENCE_ID=" + snpname + "-CAPS-" + str(i+1) + "\n" + \
+			"SEQUENCE_TEMPLATE=" + wild_seq + "\n" + \
+			"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
+			"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
+			"PRIMER_MAX_SIZE=" + str(maxSize) + "\n" + \
+			"PRIMER_MIN_SIZE=" + str(minSize)  + "\n" + \
+			"PRIMER_MAX_TM=" + str(maxTm) + "\n" + \
+			"PRIMER_MIN_TM=" + str(minTm) + "\n" + \
+			"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
+			"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
+			"PRIMER_LIBERAL_BASE=1" + "\n" + \
+			"PRIMER_NUM_RETURN=5"  + "\n" + \
+			"PRIMER_EXPLAIN_FLAG=1"  + "\n" + \
+			"SEQUENCE_FORCE_LEFT_END=" + str(left_end) + "\n" + \
+			"SEQUENCE_FORCE_RIGHT_END=" + str(right_end) + "\n" + \
+			"SEQUENCE_TARGET=" + str(snp_pos - 20) + ",40" + "\n" + \
+			"="
+			n += 1
+			p3input.write(settings + "\n")
 
 		p3input.close()
 		
@@ -1029,4 +1031,3 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 # design primers
 
 caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price)
-	
