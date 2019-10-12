@@ -684,8 +684,8 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 			dcaps_list.append(enzyme)
 	print "caps_list is ", [x.name for x in caps_list]
 	print "dcaps_list is ", [x.name for x in dcaps_list]
-	variation = [] # variation sites that can differ ALL
-	variation2 = [] # variation sites that can differ at least 2 homeologs
+	#variation = [] # variation sites that can differ ALL
+	#variation2 = [] # variation sites that can differ at least 2 homeologs
 	
 	# STEP 0: create alignment file and primer3output file
 	#RawAlignFile = "alignment_raw_" + seqfile
@@ -741,7 +741,7 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 		#for enzyme in caps_list:
 		settings = "PRIMER_TASK=generic" + "\n" + \
 		"SEQUENCE_ID=" + snpname + "-CAPS-" + "\n" + \
-		"SEQUENCE_TEMPLATE=" + wild_seq + "\n" + \
+		"SEQUENCE_TEMPLATE=" + wild_seq.lower() + "\n" + \
 		"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 		"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
 		"PRIMER_MAX_SIZE=" + str(maxSize) + "\n" + \
@@ -923,7 +923,7 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 				right_end = i + 1
 			settings = "PRIMER_TASK=generic" + "\n" + \
 			"SEQUENCE_ID=" + snpname + "-CAPS-" + str(i+1) + "\n" + \
-			"SEQUENCE_TEMPLATE=" + wild_seq + "\n" + \
+			"SEQUENCE_TEMPLATE=" + wild_seq.lower() + "\n" + \
 			"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
 			"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
 			"PRIMER_MAX_SIZE=" + str(maxSize) + "\n" + \
