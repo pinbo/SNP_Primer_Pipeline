@@ -353,15 +353,19 @@ def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match w
 	wild_seq = wild_seq.lower()
 	mut_seq = mut_seq.lower()
 	pos_L, pos_R = dif_region(wild_seq, mut_seq) # differnce region borders in the wild_seq
+	length_diff = len(wild_seq) - len(mut_seq)
 	#print "pos_L, pos_R ", pos_L, pos_R
-	enzyme_name = enzyme.name
+	#enzyme_name = enzyme.name
 	enzyme_seq = enzyme.seq.strip("n") # some enzyme has sequence beginning and ending with n, such as TspRI,72, nncastgnn
 	for i in range(len(enzyme_seq)):
 		ss = seq2pattern(enzyme_seq[0:i]) + "[atgc]" + seq2pattern(enzyme_seq[i+1:]) # regular expression
 		#print "find_substring(ss, wild_seq), ", i, find_substring(ss, wild_seq)
 		#print "find_substring(ss, mutt_seq), ", i, find_substring(ss, mut_seq) 
+		wild_fits = find_substring(ss, wild_seq)
+		mut_fits = find_substring(ss, mut_seq)
+		mut_fits_adjusted = [x if x < pos_L else x + length_diff for x in mut_fits] # adjust enzyme cut positions on the right of indel
 		#if len(re.findall(ss, wild_seq)) != len(re.findall(ss, mut_seq)): # differnt length should be caused by the differnce in the SNP/indel
-		if find_substring(ss, wild_seq) != find_substring(ss, mut_seq): # even they are the same length, if the start position is different, it is still okay
+		if wild_fits != mut_fits_adjusted: # even they are the same length, if the start position is different, it is still okay
 		#print "Enzyme, Enzyme seq, pattern ", enzyme_name, enzyme_seq, ss
 			for m in re.finditer(ss, wild_seq): # iterate all the matching places
 				change_pos = m.start() + i # which was changed
