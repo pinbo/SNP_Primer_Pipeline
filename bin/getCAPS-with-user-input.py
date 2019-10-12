@@ -369,11 +369,14 @@ def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match w
 		#print "Enzyme, Enzyme seq, pattern ", enzyme_name, enzyme_seq, ss
 			for m in re.finditer(ss, wild_seq): # iterate all the matching places
 				change_pos = m.start() + i # which was changed
+				nt0 = wild_seq[change_pos] # original nt
+				nt1 = enzyme_seq[i] # changed nt
+				if nt0 == nt1: break
 				# if the left first different nt between wt and mut is in the enzyme recognization site and the change position is more than 1 nt from it.
 				if pos_L in range(m.start(), m.end()) and pos_L - change_pos > 1:
 					enzyme.primer_direction = "left" # use as left primer end positions
 					enzyme.primer_end_pos += range(change_pos + 1, pos_L)
-					change_pos = m.start() + i # which was changed
+					#change_pos = m.start() + i # which was changed
 					print "One nt can be changed to fit enzyme", enzyme.name
 					enzyme.dcaps = "Yes"
 					enzyme.template_seq = wild_seq[:change_pos] + enzyme_seq[i].upper() + wild_seq[change_pos+1:]
@@ -385,7 +388,7 @@ def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match w
 				if pos_R in range(m.start(), m.end()) and change_pos - pos_R > 1:
 					enzyme.primer_direction = "right" # use as right primer end positions
 					enzyme.primer_end_pos += range(pos_R + 1, change_pos)
-					change_pos = m.start() + i # which was changed
+					#change_pos = m.start() + i # which was changed
 					print "One nt can be changed to fit enzyme", enzyme.name
 					enzyme.dcaps = "Yes"
 					enzyme.template_seq = wild_seq[:change_pos] + enzyme_seq[i].upper() + wild_seq[change_pos+1:]
