@@ -478,6 +478,8 @@ def get_fasta(infile):
 		for line in file_one:
 			line = line.strip()
 			if line: # skip blank lines
+				if line.startswith("alignment"):
+					continue
 				if line.startswith(">"):
 					sequence_name = line.lstrip("> ").split()[0] # left strip > or space, so " > abc edf" will be "abc edf", then split by space to get "abc"
 					fasta[sequence_name] = ""
