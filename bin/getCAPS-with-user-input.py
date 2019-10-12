@@ -484,7 +484,7 @@ def get_fasta(infile):
 					sequence_name = line.lstrip("> ").split()[0] # left strip > or space, so " > abc edf" will be "abc edf", then split by space to get "abc"
 					fasta[sequence_name] = ""
 				else:
-					fasta[sequence_name] += line.replace(" ", "").replace("-", "") # remove spaces and - in case
+					fasta[sequence_name] += line.replace(" ", "") # remove spaces in case
 	return fasta
 
 # in case multiple hit in the same chromosome in the psudomolecule
@@ -659,6 +659,8 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 	#fasta_raw, target, ids = get_fasta2(seqfile, chrom)
 	fasta_raw = get_fasta(seqfile)
 	seq_names = fasta_raw.keys()
+	for i in seq_names:
+		fasta_raw[i] = fasta_raw[i].replace("-", "") # remove "-" in raw file if it is from an alignment
 	ids = [i for i in seq_names if i != target] # other non-target sequence names
 	print "ids is ", ids
 	
