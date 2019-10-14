@@ -738,7 +738,7 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 				n += 1
 				p3input.write(settings + "\n")
 		# for caps
-		product_min = 300
+		product_min = 100
 		product_max = 900
 		left_end = -1000000
 		right_end = -1000000
@@ -746,7 +746,7 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 		settings = "PRIMER_TASK=generic" + "\n" + \
 		"SEQUENCE_ID=" + snpname + "-CAPS-" + "\n" + \
 		"SEQUENCE_TEMPLATE=" + wild_seq.lower() + "\n" + \
-		"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
+		"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-300 300-500 500-" + str(product_max) + "\n" + \
 		"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
 		"PRIMER_MAX_SIZE=" + str(maxSize) + "\n" + \
 		"PRIMER_MIN_SIZE=" + str(minSize)  + "\n" + \
@@ -913,7 +913,7 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 					n += 1
 					p3input.write(settings + "\n")
 		# for caps
-		product_min = 300
+		product_min = 100
 		product_max = 900
 		# since indels already has at least 1 bp differnce, so I will always design primers flanking the indel
 		# if the indel is > 2 bp, I can directly use PAGE to separate the bands
@@ -928,7 +928,7 @@ def caps(seqfile, target, SNP_A, SNP_B, snp_pos, max_price): # two alleles now s
 			settings = "PRIMER_TASK=generic" + "\n" + \
 			"SEQUENCE_ID=" + snpname + "-CAPS-" + str(i+1) + "\n" + \
 			"SEQUENCE_TEMPLATE=" + wild_seq.lower() + "\n" + \
-			"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-" + str(product_max) + "\n" + \
+			"PRIMER_PRODUCT_SIZE_RANGE=" + str(product_min) + "-300 300-500 500-" + str(product_max) + "\n" + \
 			"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
 			"PRIMER_MAX_SIZE=" + str(maxSize) + "\n" + \
 			"PRIMER_MIN_SIZE=" + str(minSize)  + "\n" + \
