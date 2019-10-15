@@ -346,7 +346,7 @@ def seq2pattern(seq):
 			seq2 += i
 		else:
 			seq2 += iupac[i]
-	#seq2 = '(?=(' +  seq2 + '))'
+	seq2 = '(?=(' +  seq2 + '))' # I forgot why I commented this out before. This one can find overlap sites
 	return seq2.lower()
 
 def check_pattern(enzyme, wild_seq, mut_seq): # check whether enzyme can match wild_seq after 1 base change but not mut_seq
