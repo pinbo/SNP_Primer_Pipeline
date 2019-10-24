@@ -1,0 +1,38 @@
+<tool id="snp2polymarker" name="SNP Position to Polymarker Input">
+  <description>for exon capture SNP positions</description>
+  <command interpreter="python2">bin/SNP_Pos2polymarker_input.py $input for_polymarker.csv $reference</command>
+  <inputs>
+    <param format="txt" name="input" type="data" label="Tab-delimited file"/>
+    <param name="reference" type="select" label="Which reference to use?">
+        <option value="/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta">Chinese_Spring_RefSeq_v1.0</option>
+        <option value="/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_v2_ChrU.fa">IWGSC_v2_ChrU</option>
+    </param>
+  </inputs>
+  <outputs>
+      <data format="txt" name="output" from_work_dir="for_polymarker.csv" label="${tool.name} for polymarker"/>
+  </outputs>
+
+  <help>
+
+**OVERVIEW**
+
+This tool prepare polymarker input file from a SNP position in a contig or chromosome. The input file is a **tab or space delimited** file and each line looks like this (Contig or Chromosome name, SNP position, Reference allele, and Alternative allele)
+
+IWGSC_CSS_7AL_scaff_4491815	4083	T	A
+
+IWGSC_CSS_7AL_scaff_4552312	3240	G	T
+
+output file is a csv file (50 bp flanking sequences on each side) and looks like this:
+
+CSS7AL4491815,7AL,AGGTCTCACAGATTTACATACTAGGGGCTCGAGGCCCAACATAGCTCGAT[T/A]ACATCATATCGAGTGGCATCGAGGAGGGGTTTGGCAACTCTGGTGGCCGT
+
+CSS7AL4552312,7AL,CATATAGGACAAGATCCGAGAGCTCGTTTGCCATGATTAACCAGCCATGG[G/T]AGGCACCGCAGCAGGCCACAGCTTGGCCCCTGGGAAAGCTGACCTGAAAA
+
+
+------
+
+For more information, please check: https://github.com/pinbo/getKASP_pipeline
+
+  </help>
+
+</tool>
