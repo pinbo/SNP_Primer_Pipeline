@@ -5,7 +5,8 @@ Polymarker (http://polymarker.tgac.ac.uk/) is a great software to design KASP pr
 
 # Main Changes
 
-- 09/02/2019: add "PRIMER\_PICK\_ANYWAY" option for the situation when no primers wer obtained.
+- 10/23/2019: Change all script to use python2 and make it easy for users to implement on there Galaxy server.
+- 09/02/2019: add "PRIMER\_PICK\_ANYWAY" option for the situation when no primers were obtained.
 - 09/01/2019: add a primer3 global setting file for easy change some parameters.
 - 09/01/2019: add maximum primer length parameter for low GC content region
 - 08/02/2019: add a maximum hits filter: if more than 6 hits, do not design for this SNP, because some SNPs have too many hits.
@@ -15,7 +16,7 @@ Polymarker (http://polymarker.tgac.ac.uk/) is a great software to design KASP pr
 - 08/29/2017 Included xml files for used in galaxy
 - 08/29/2017 Added a script for extracting sequences in the reference file.
 - 06/05/2017 Added step to design both CAPS and dCAPS primers using the restriction enzyme list from NEB.
-- 05/14/2017 Added steps to check restriciton enzymes for CAPS marker design.
+- 05/14/2017 Added steps to check restriction enzymes for CAPS marker design.
 - Added ploidy parameter for wheat species in different ploidy.
 
 # Pseudo code
@@ -55,13 +56,41 @@ I divided the pipeline into 8 steps:
 
 You can run this step by step or run the whole pipeline with script "run_getkasp.py". I suggest run the 6 steps in the script "run_getkasp.py" stey by step to get familiar how it works first.
 
-Example: `run_getkasp.py for_polymarker.csv 3 200 1 1 1`
+Example: `run_getkasp.py for_polymarker.csv 3 200 1 1 0 63 25 /home/junli/blastdb/iwgsc_refseqv1.0.fasta`
 
-Inputs are: ploidy, enzyme maximum price (per 1000 U), whether to design CAPS (1 for yes and 0 for NO), whether to design KASP (1 for yes and 0 for NO), whether to blast primers (1 for yes and 0 for NO)
+Inputs are: polymarker_input, ploidy, enzyme maximum price (per 1000 U), whether to design CAPS (1 for yes and 0 for NO), whether to design KASP (1 for yes and 0 for NO), whether to blast primers (1 for yes and 0 for NO), maximum Tm (63 C for example), maximum primer size (25 bp for example), whether to pick primer anyway even if it violates specific constrains, reference file path.
 
-Change the software paths, blast contig names and locations etc accordingly.
 
-The "bin" folder has all the scripts for each step and softare primer3 and muscle in case your system does not have them.
+The "bin" folder has all the scripts for each step and software primer3 and muscle in case your system does not have them.
+
+# How to implement it to your own Galaxy server
+
+I suggest put both the "**SNP Position to polymarker input**" and the "**SNP Design Pipeline**" tools in the Galaxy tool menu.
+
+1. Go to the Galaxy root folder and go to the "tools" folder: `cd tools`
+
+1. Clone the SNP Primer Design Pipeline to the "tools" folder: `git clone https://github.com/pinbo/SNP_Primer_Pipeline.git`
+
+1. Go to the "SNP\_Primer\_Pipeline" folder: `cd SNP_Primer_Pipeline`
+
+1. Make a copy of the file "*SNP2polymarker.xml.example*" and rename it "*SNP2polymarker.xml*". Or `cp SNP2polymarker.xml.example SNP2polymarker.xml`. Do the same thing for "*getkasp.xml.example*": `cp getkasp.xml.example getkasp.xml`
+
+1. Edit the configuration files "SNP2polymarker.xml" and "getkasp.xml". At least change the reference file location (Red rectangle in the screenshot below): "value=" is the location.
+![change reference location](./files/change-references.png)
+
+1. Go back to the Galaxy root folder and go to the "config" folder and add the tool xml location in the file "*tool\_conf.xml*". If the file is not there, just make a copy of "*tool\_conf.xml.sample*" and rename it "*tool\_conf.xml*". Then add the tool xml location there:
+```{xml}
+<section name="SNP_Primer_Design" id="snp_primer">
+    <tool file="SNP_Primer_Pipeline/getkasp.xml" />
+    <tool file="SNP_Primer_Pipeline/SNP2polymarker.xml" />
+</section>
+```
+![add xml file to tool_config](./files/add-xml.png)
+
+Now the tools should be there. 
+![tools on galaxy](./files/tools-on-galaxy.png)
+
+More details about adding your own tools to Galaxy can be found here: https://galaxyproject.org/admin/tools/add-tool-tutorial/
 
 # Acknowledgements
 I borrowed ideas from the polymarker scripts (https://github.com/TGAC/bioruby-polyploid-tools), a great tool for Genome Specific KASPar design in polyploid species. Thanks to the author of Polymarker.
