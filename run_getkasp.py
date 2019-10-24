@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
 #  run_getkasp.py
@@ -43,10 +43,11 @@ def main(args):
 	max_Tm = args[7]
 	max_size = args[8]
 	pick_anyway = args[9] # pick primer anyway even if it violates specific constrains
+	reference = args[10]
 	
 	script_path = os.path.dirname(os.path.realpath(__file__)) + "/bin/" # scripts folder
 	#reference = "/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_CSS_ABD-TGAC_v1.fa" # blast contig file
-	reference = "/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta"
+	#reference = "/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta"
 	
 	# step 1:
 	cmd1 = script_path + "parse_polymarker_input.py " + polymarker_input

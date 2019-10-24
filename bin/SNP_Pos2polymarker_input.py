@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
 #  SNP_Pos2polymarker_input.py
@@ -127,9 +127,10 @@ def get_fasta(infile, seq_name_list):
 def main(argv):
 	snpinfo = argv[1] # input file
 	outfile = argv[2] # output file
-	reference_list = ["/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_v2_ChrU.fa", 
-	"/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta"]
-	reference = reference_list[int(argv[3]) - 1] # 1 or 2 for reference
+	# reference_list = ["/Library/WebServer/Documents/blast/db/nucleotide/IWGSC_v2_ChrU.fa", 
+	# "/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta"]
+	# reference = reference_list[int(argv[3]) - 1] # 1 or 2 for reference
+	reference = argv[3]
 	snpdict, seq_name_list = parse_exon_snp(snpinfo)
 	print "length of snpdict ", len(snpdict)
 	range_file = "temp_range.txt"
