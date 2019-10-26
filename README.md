@@ -31,11 +31,11 @@ Polymarker (http://polymarker.tgac.ac.uk/) is a great software to design KASP pr
 # Dependencies
 
 SNP_Primer_Pipeline needs following 3 software to find differences among homeologs and design primer.
-1. Muscle: Multiple sequence alignment program (http://www.drive5.com/muscle/)
-2. Primer3: program for designing PCR primers (http://primer3.sourceforge.net/)
-3. blast+ package from NCBI (https://blast.ncbi.nlm.nih.gov/Blast.cgi)
+1. **Muscle**: Multiple sequence alignment program (http://www.drive5.com/muscle/)
+2. **Primer3**: program for designing PCR primers (http://primer3.sourceforge.net/)
+3. **blast+** package from NCBI (https://blast.ncbi.nlm.nih.gov/Blast.cgi)
 
-"muscle" and "primer3_core" are included in the package, but "blast+" should be installed in the your system.
+"**muscle**" and "**primer3_core**" are included in the package, so "**blast+**" is the only software you need to install in your system.
 
 # How it works
 1. Find all the different sites that can differ all other sequences from the user provided alignment file;
@@ -64,6 +64,10 @@ Inputs are: polymarker_input, ploidy, enzyme maximum price (per 1000 U), whether
 The "bin" folder has all the scripts for each step and software primer3 and muscle in case your system does not have them.
 
 # How to implement it to your own Galaxy server
+
+**Before doing this, please make your blast database ready.** For wheat, please download the RefSeqv1.0 for example, and extract the fasta file, then run the command below to make it blastable:
+
+`makeblastdb -in 161010_Chinese_Spring_v1.0_pseudomolecules.fasta -dbtype nucl -parse_seqids`
 
 I suggest put both the "**SNP Position to polymarker input**" and the "**SNP Design Pipeline**" tools in the Galaxy tool menu.
 
