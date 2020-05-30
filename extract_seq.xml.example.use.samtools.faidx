@@ -1,0 +1,46 @@
+<tool id="ExtractSequences" name="Extract Sequences from References">
+  <description>extract sequence ranges in a contig or chromosome</description>
+  <command>samtools faidx $reference -r $input -o temp_flanking_seq.fa</command>
+  <inputs>
+    <param format="txt" name="input" type="data" label="Region file, Format is chr:from-to, one per line." help="For example, 'chr2A:4033-4133' OR just the sequence name without range and strand: 'TraesCS7A02G481400.1' "/>
+
+    <!--
+    <param name="input" size="10x25" type="text" value="" area="true" label="sequence name and ranges (each line is one entry)" help="For example, 'chr2A 4033-4133 minus' OR just the sequence name without range and strand: 'TraesCS7A02G481400.1' "/>
+    -->
+    <param name="reference" type="select" label="Which reference to use?">
+	<option value="/Library/WebServer/Documents/blast/db/nucleotide/161010_Chinese_Spring_v1.0_pseudomolecules.fasta">Chinese_Spring_RefSeqv1.0</option>
+	<option value="/Users/galaxy/blastdb/IWGSC_v1.1_HC_20170706_cds.fasta">Refseq v1.1 high confidence genes: IWGSC_v1.1_HC_20170706_CDs</option>
+    </param>
+  </inputs>
+  <outputs>
+      <data format="fasta" name="output" from_work_dir="temp_flanking_seq.fa" label="Extracted_sequences"/>
+  </outputs>
+
+  <help>
+
+**OVERVIEW**
+
+This tool extract sequences ranges from a chromosome or contig with "Samtools faidx". More information can be found in samtools help page.
+
+**output file** is a fasta file file and looks like this:
+
+>chr2A:4033-4133
+
+TTTCAAACCATAGGGACCTAAAAATTAGAAGTCATTCCATCTTTATTCCCCTAGACCCTAACACACTATTCTAGCTAGAC
+ATGGGTGTGGCTCGTAACACC
+
+------
+
+**Differences between references**
+
+Chinese_Spring_v1.0_pseudomolecules: The latest hexaploid pseudomolecule.
+
+IWGSC_v1.1_HC_20170706_CDs: RefSeq v1.1 annotations, gene names are like this: TraesCS7A02G481400.1
+
+------
+
+For more information, please check: https://github.com/pinbo/SNP_Primer_pipeline
+
+  </help>
+
+</tool>
