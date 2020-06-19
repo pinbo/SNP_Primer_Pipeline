@@ -50,7 +50,7 @@ class SNP:
 			self.name = contig + "-" + str(ref_pos)
 		else:
 			self.chr = contig # last two characters
-			self.name = contig + ref_pos
+			self.name = contig + "-" + str(ref_pos)
 		xstream = 50 # get 50 bps on each side
 		self.contig = contig
 		self.ref_pos = ref_pos
