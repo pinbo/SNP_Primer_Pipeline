@@ -448,13 +448,13 @@ def kasp(seqfile):
 	call(alignmentcmd, shell=True)
 	settings_common = "PRIMER_TASK=generic" + "\n" + \
 		"SEQUENCE_TEMPLATE=" + seq_template + "\n" + \
-		"PRIMER_PRODUCT_SIZE_RANGE=50-100 100-150 150-250" + "\n" + \
+		"PRIMER_PRODUCT_SIZE_RANGE=40-70 70-100 100-120 120-150 150-200 200-250" + "\n" + \
 		"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getkasp_path + "/primer3_config/"  + "\n" + \
 		"PRIMER_MAX_SIZE=" + max_size + "\n" + \
 		"PRIMER_MIN_TM=57.0" + "\n" + \
-		"PRIMER_OPT_TM=60.0" + "\n" + \
+		"PRIMER_OPT_TM=62.0" + "\n" + \
 		"PRIMER_MAX_TM=" + max_Tm + "\n" + \
-		"PRIMER_PAIR_MAX_DIFF_TM=6.0" + "\n" + \
+		"PRIMER_PAIR_MAX_DIFF_TM=2.0" + "\n" + \
 		"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
 		"PRIMER_LIBERAL_BASE=1" + "\n" + \
 		"PRIMER_NUM_RETURN=5"  + "\n" + \
