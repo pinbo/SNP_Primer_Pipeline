@@ -449,12 +449,11 @@ def kasp(seqfile):
 	settings_common = "PRIMER_TASK=generic" + "\n" + \
 		"SEQUENCE_TEMPLATE=" + seq_template + "\n" + \
 		"PRIMER_PRODUCT_SIZE_RANGE=40-70 70-100 100-120 120-150 150-200 200-250" + "\n" + \
-		"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getkasp_path + "/primer3_config/"  + "\n" + \
 		"PRIMER_MAX_SIZE=" + max_size + "\n" + \
 		"PRIMER_MIN_TM=57.0" + "\n" + \
 		"PRIMER_OPT_TM=62.0" + "\n" + \
 		"PRIMER_MAX_TM=" + max_Tm + "\n" + \
-		"PRIMER_PAIR_MAX_DIFF_TM=2.0" + "\n" + \
+		"PRIMER_PAIR_MAX_DIFF_TM=5.0" + "\n" + \
 		"PRIMER_FIRST_BASE_INDEX=1" + "\n" + \
 		"PRIMER_LIBERAL_BASE=1" + "\n" + \
 		"PRIMER_NUM_RETURN=5"  + "\n" + \
@@ -485,7 +484,7 @@ def kasp(seqfile):
 		p3input.close()
 		# primer3 output file
 		primer3output = directory + "/primer3.output." + snpname
-		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " -p3_settings_file=" + global_setting_file + " " + primer3input
+		p3cmd = primer3_path + " -output=" + primer3output + " -p3_settings_file=" + global_setting_file + " " + primer3input
 		print "Primer3 command 1st time: ", p3cmd
 		call(p3cmd, shell=True)
 		primerpairs = parse_primer3output(primer3output, 5)
@@ -633,7 +632,7 @@ def kasp(seqfile):
 
 		# primer3 output file
 		primer3output = directory + "/primer3.output." + snpname
-		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " -p3_settings_file=" + global_setting_file + " " + primer3input
+		p3cmd = primer3_path + " -output=" + primer3output + " -p3_settings_file=" + global_setting_file + " " + primer3input
 		print "Primer3 command 1st time: ", p3cmd
 		call(p3cmd, shell=True)
 		primerpairs = parse_primer3output(primer3output, 1)

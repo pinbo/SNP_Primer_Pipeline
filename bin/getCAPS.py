@@ -621,7 +621,6 @@ def caps(seqfile):
 				"SEQUENCE_ID=" + snpname + "-dCAPS-" + enzyme.name + "-" + enzyme.seq + "-" + str(primer_end_pos+1) + "\n" + \
 				"SEQUENCE_TEMPLATE=" + enzyme.template_seq + "\n" + \
 				"PRIMER_PRODUCT_SIZE_RANGE=150-200 200-250 70-150" + "\n" + \
-				"PRIMER_THERMODYNAMIC_PARAMETERS_PATH=" + getcaps_path + "/primer3_config/"  + "\n" + \
 				"SEQUENCE_FORCE_LEFT_END=" + str(left_end) + "\n" + \
 				"SEQUENCE_FORCE_RIGHT_END=" + str(right_end) + "\n" + \
 				"="
@@ -661,7 +660,7 @@ def caps(seqfile):
 			return 0
 		# primer3 output file
 		primer3output = directory + "/primer3.output." + snpname
-		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " -p3_settings_file=" + global_setting_file + " " + primer3input
+		p3cmd = primer3_path + " -output=" + primer3output + " -p3_settings_file=" + global_setting_file + " " + primer3input
 		print "Primer3 command 1st time: ", p3cmd
 		call(p3cmd, shell=True)
 		primerpairs = parse_primer3output(primer3output, 5)
@@ -824,7 +823,7 @@ def caps(seqfile):
 			return 0
 		# primer3 output file
 		primer3output = directory + "/primer3.output." + snpname
-		p3cmd = primer3_path + " -default_version=2 -output=" + primer3output + " -p3_settings_file=" + global_setting_file + " " + primer3input
+		p3cmd = primer3_path + " -output=" + primer3output + " -p3_settings_file=" + global_setting_file + " " + primer3input
 		print "Primer3 command 1st time: ", p3cmd
 		call(p3cmd, shell=True)
 
