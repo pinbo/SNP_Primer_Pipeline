@@ -28,6 +28,9 @@
 # change the input wildcard and the paths of primer3 and muscle accordingly.
 # NOTES: the output primer pair includes the common primer and the primer with SNP A or T, you need to change the 3' nucleartide to get the primer for the other SNP.
 
+# changes
+# 2022-09-15: add a simple score for auto-selection and only use positions that can diff all homeologs (variations instead of variations2)
+
 ### Imported
 from subprocess import call
 import getopt, sys, os, re
@@ -97,6 +100,7 @@ class PrimerPair(object):
 		self.compl_end = "NA"
 		self.penalty = "NA"
 		self.product_size = 0
+		self.score = 0
 
 # simple Tm calculator
 def Tm(seq):
@@ -610,7 +614,7 @@ def kasp(seqfile):
 		if alt_allele in "ATat":
 			seq_template = seq_template[:snp_site] +  alt_allele + seq_template[snp_site + 1:]
 
-		for i in variation2:
+		for i in variation: # use variation2 if you want semi-specific primers.
 			if i == snp_site:
 				continue
 			elif i < snp_site:
@@ -643,6 +647,7 @@ def kasp(seqfile):
 		final_primers = {} # final primers for output
 		nL = 0 # left primer count
 		nR = 0 # right primer count
+		dif3all = 0 # whether 3' end of common primers can differ all homeologs
 		for i, pp in primerpairs.items():
 			varsite = int(i.split("-")[-2]) - 1 # variation site
 			#print "varsite", varsite
@@ -653,6 +658,7 @@ def kasp(seqfile):
 				if varsite in variation:
 					pl.difthreeall = "YES"
 					pr.difthreeall = "YES"
+					dif3all = 1
 				if varsite < snp_site:
 					pc = pl # pc is the common primer
 					# rr: range to check; only check 10 bases from 3' end
@@ -660,6 +666,8 @@ def kasp(seqfile):
 				else:
 					pc = pr
 					rr = range(pc.end -1, min(pc.end + 9, len(seq_template) - 20)) # rr should be within the keys of diffarray, which is from gap_left to gap_right
+				# calculate a simple score for selection: only consider product size, 3'diff all, and Tm diff, diff number
+				pp.score = dif3all*5.0 + 150.0/pp.product_size + pc.difnum/10.0 - abs(pl.tm - pr.tm)/10.0
 				# sum of all the variation in each site
 				aa = [sum(x) for x in zip(*(diffarray[k] for k in rr))]
 				print "aa ", aa
@@ -682,7 +690,7 @@ def kasp(seqfile):
 	#################################################	
 	# write to file
 	outfile = open(out, 'w')
-	outfile.write("index\tproduct_size\ttype\tstart\tend\tvariation number\t3'diffall\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\tpenalty\tcompl_any\tcompl_end\tPrimerID\tmatched_chromosomes\n")			
+	outfile.write("index\tproduct_size\ttype\tstart\tend\tvariation number\t3'diffall\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\tpenalty\tcompl_any\tcompl_end\tPrimerID\tmatched_chromosomes\tscore\n")
 	# blast primers
 	blast_hit = {}
 	outfile_blast = directory + "/primer_blast_out_" + snpname + ".txt"
@@ -710,9 +718,9 @@ def kasp(seqfile):
 			pA.seq = pA.seq[:-1] + ReverseComplement(SNP_A)
 			pB.seq = pB.seq[:-1] + ReverseComplement(SNP_B)
 			pC = pl
-		outfile.write("\t".join([i + "-" + SNP_A, str(pp.product_size), pA.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pA.name, blast_hit.setdefault(pA.name, "")]) + "\n")
-		outfile.write("\t".join([i + "-" + SNP_B, str(pp.product_size), pB.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pB.name, blast_hit.setdefault(pB.name, "")]) + "\n")
-		outfile.write("\t".join([i + "-Common", str(pp.product_size),   pC.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, pC.name, blast_hit.setdefault(pC.name, "")]) + "\n")
+		outfile.write("\t".join([i + "-" + SNP_A, str(pp.product_size), pA.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, str(pp.score), pA.name, blast_hit.setdefault(pA.name, "")]) + "\n")
+		outfile.write("\t".join([i + "-" + SNP_B, str(pp.product_size), pB.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, str(pp.score), pB.name, blast_hit.setdefault(pB.name, "")]) + "\n")
+		outfile.write("\t".join([i + "-Common", str(pp.product_size),   pC.formatprimer(), pp.penalty, pp.compl_any, pp.compl_end, str(pp.score), pC.name, blast_hit.setdefault(pC.name, "")]) + "\n")
 
 	outfile.write("\n\nSites that can differ all for " + snpname + "\n")
 	outfile.write(", ".join([str(x + 1) for x in variation])) # change to 1 based
