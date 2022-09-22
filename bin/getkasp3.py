@@ -690,7 +690,7 @@ def kasp(seqfile):
 	#################################################	
 	# write to file
 	outfile = open(out, 'w')
-	outfile.write("index\tproduct_size\ttype\tstart\tend\tvariation number\t3'diffall\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\tpenalty\tcompl_any\tcompl_end\tPrimerID\tmatched_chromosomes\tscore\n")
+	outfile.write("index\tproduct_size\ttype\tstart\tend\tvariation number\t3'diffall\tlength\tTm\tGCcontent\tany\t3'\tend_stability\thairpin\tprimer_seq\tReverseComplement\tpenalty\tcompl_any\tcompl_end\tscore\tPrimerID\tmatched_chromosomes\n")
 	# blast primers
 	blast_hit = {}
 	outfile_blast = directory + "/primer_blast_out_" + snpname + ".txt"
